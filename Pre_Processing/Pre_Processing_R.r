@@ -9,6 +9,163 @@ library(readxl)
 library(corrplot)
 library("readxl")
 
+
+
+#Accessing PostgreSQL database
+#tutorial: https://www.r-spatial.org/2017/07/14/large_scale_osm_in_r 
+#load required package  
+library(RPostgreSQL)
+
+#load postgresql driver
+driver <- dbDriver("PostgreSQL")
+
+#create connection to postgresql database
+#the connection variable will be used for all further operations
+connection <- dbConnect(driver, dbname = "user12db",
+                        host = "developer.cege.ucl.ac.uk", port = 33029,
+                        user = "user12", password = "user12password")
+
+
+#test if connection succesful (returns true)
+dbExistsTable(connection, "m_bulkcheck_polygon")
+
+
+#####################################REMOVING BULK IMPORTS####################################
+
+##########################################MANCHESTER#########################################
+
+
+#load manchester tables
+m_bulkcheck_polygon <- dbGetQuery(connection, "select * from m_bulkcheck_polygon")
+m_bulkcheck_point <- dbGetQuery(connection, "select * from m_bulkcheck_point")
+m_bulkcheck_line <- dbGetQuery(connection, "select * from m_bulkcheck_line")
+
+#left join
+bb <- left_join(m_bulkcheck_point, m_bulkcheck_polygon, by=c("osm_uid"="osm_uid", "osm_timestamp"="osm_timestamp"))
+
+#left join
+bbb <- bb <- left_join(bb, m_bulkcheck_line, by=c("osm_uid"="osm_uid", "osm_timestamp"="osm_timestamp"))
+
+#change column names
+names(bbb)[3]<-"point"
+names(bbb)[4]<-"poly"
+names(bbb)[5]<-"line"
+
+#replace na with 0
+bbb[is.na(bbb)] <- 0
+
+#add a daily total column for each user each day of edits
+bbb$day_total <- (bbb$point+bbb$poly+bbb$line)
+
+
+#option 1 ----------------------
+#if more than 1000 edits per user per day, change day_total to na
+bbb$day_total[bbb$day_total > 1000 & is.numeric(bbb$day_total)] <- NA
+
+#remove na
+bbb_nona <- na.omit(bbb)
+
+#create dataframe of relevant columns with all bulk removes
+manchester_minus_bulk <- bbb_nona[,1:3]
+#write.csv(manchester_minus_bulk, file = "manchester_minus_bulk.csv")
+
+#option 2 -----------------------
+#backup dataframe
+bbbx <- bbb
+#create dataframe inlcuding only the rows which have na in the day_total column (>1000)
+bbbx_na <- bbbx[is.na(bbbx$day_total),]
+
+#double check 
+sum(is.na(bbbx$day_total))
+
+#create dataframe of relevant columns with just bulk
+manchester_remove_bulk <- bbbx_na[,1:2]
+#write.csv(manchester_remove_bulk, file = "manchester_remove_bulk.csv")
+
+#######################################NAIROBI####################################
+#load nairobi tables
+n_bulkcheck_polygon <- dbGetQuery(connection, "select * from n_bulkcheck_polygon")
+n_bulkcheck_point <- dbGetQuery(connection, "select * from n_bulkcheck_point")
+n_bulkcheck_line <- dbGetQuery(connection, "select * from n_bulkcheck_line")
+
+#join 2 tables
+nn <- left_join(n_bulkcheck_point, n_bulkcheck_polygon, by=c("osm_uid"="osm_uid", "osm_timestamp"="osm_timestamp"))
+#join third
+nnn <- left_join(nn, n_bulkcheck_line, by=c("osm_uid"="osm_uid", "osm_timestamp"="osm_timestamp"))
+
+#change column names
+names(nnn)[3]<-"point"
+names(nnn)[4]<-"poly"
+names(nnn)[5]<-"line"
+
+#replace na with -
+nnn[is.na(nnn)] <- 0
+
+#add total colum
+nnn$day_total <- (nnn$point+nnn$poly+nnn$line)
+
+nnn$day_total <- as.numeric(as.character(nnn$day_total))
+#nnn[nnn$day_total >1000] <-
+
+#replace any values in the day_total column >1000 with na
+nnn$day_total[nnn$day_total > 1000 & is.numeric(nnn$day_total)] <- NA
+
+#option1 ----------------
+#remove na
+nnn_nona <- na.omit(nnn)
+
+#if more than 1000 edits per user per day, change day_total to na
+nairobi_minus_bulk <- nnn_nona[,1:3]
+#write.csv(nairobi_minus_bulk, file = "nairobi_minus_bulk.csv")
+
+#backup df
+nnnx <- nnn
+#make df out of na rows online
+nnnx_na <- nnnx[is.na(nnnx$day_total),]
+
+#double check
+sum(is.na(nnnx$day_total))
+
+#create dataframe of relevant columns with just bul
+nairobi_remove_bulk <- nnnx_na[,1:2]
+#write.csv(nairobi_remove_bulk, file = "nairobi_remove_bulk.csv")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #####NAIROBI#####
 
 

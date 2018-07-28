@@ -30,6 +30,18 @@ connection <- dbConnect(driver, dbname = "user12db",
 dbExistsTable(connection, "m_bulkcheck_polygon")
 
 
+library(sf)
+
+library(dplyr)
+library(stringr)
+library(ggplot2)
+#test sanity 
+pointz <- dbGetQuery(connection, "select *, ST_AsText(way) AS geom from nairobi_final_point2")
+pointzz <- st_as_sf(pointz, wkt="geom") %>% st_set_crs(4326)
+plot1 <- ggplot(pointzz$geom)
+plot1
+install.packages("cairo")
+
 #####################################REMOVING BULK IMPORTS####################################
 
 ##########################################MANCHESTER#########################################
@@ -386,11 +398,59 @@ write.csv(manchester_uid_filt, file = "manchester__uid_filt.csv")
 
 
 
+###backup files at this point
+nairobi_final_polygon2 <- dbGetQuery(connection, "select * from nairobi_final_polygon2")
+nairobi_final_line2 <- dbGetQuery(connection, "select * from nairobi_final_line2")
+nairobi_final_point2 <- dbGetQuery(connection, "select * from nairobi_final_point2")
+
+manchester_final_polygon2 <- dbGetQuery(connection, "select * from manchester_final_polygon2")
+manchester_final_line2 <- dbGetQuery(connection, "select * from manchester_final_line2")
+manchester_final_point2 <- dbGetQuery(connection, "select * from manchester_final_point2")
 
 
+write.csv(nairobi_final_polygon2, file = "nairobi_final_polygon2.csv")
+write.csv(nairobi_final_line2, file = "nairobi_final_line2.csv")
+write.csv(nairobi_final_point2, file = "nairobi_final_point2.csv")
+
+write.csv(manchester_final_polygon2, file = "manchester_final_polygon2.csv")
+write.csv(manchester_final_line2, file = "manchester_final_line2.csv")
+write.csv(manchester_final_point2, file = "manchester_final_point2.csv")
 
 
+###backup the old files just incase you decide the old bulk removal method was better
+nairobi_final_polygon <- dbGetQuery(connection, "select * from nairobi_final_polygon")
+nairobi_final_line <- dbGetQuery(connection, "select * from nairobi_final_line")
+nairobi_final_point <- dbGetQuery(connection, "select * from nairobi_final_point")
 
+manchester_final_polygon <- dbGetQuery(connection, "select * from manchester_final_polygon")
+manchester_final_line <- dbGetQuery(connection, "select * from manchester_final_line")
+manchester_final_point <- dbGetQuery(connection, "select * from manchester_final_point")
+
+
+write.csv(nairobi_final_polygon, file = "nairobi_final_polygon.csv")
+write.csv(nairobi_final_line, file = "nairobi_final_line.csv")
+write.csv(nairobi_final_point, file = "nairobi_final_point.csv")
+
+write.csv(manchester_final_polygon, file = "manchester_final_polygon.csv")
+write.csv(manchester_final_line, file = "manchester_final_line.csv")
+write.csv(manchester_final_point, file = "manchester_final_point.csv")
+
+##backup the files which led to inferring locals
+nairobi_merge_point <- dbGetQuery(connection, "select * from nairobi_merge_point")
+nairobi_merge_line <- dbGetQuery(connection, "select * from nairobi_merge_point")
+nairobi_merge_polygon <- dbGetQuery(connection, "select * from nairobi_merge_point")
+
+write.csv(nairobi_merge_point, file = "nairobi_merge_point.csv")
+write.csv(nairobi_merge_line, file = "nairobi_merge_line.csv")
+write.csv(nairobi_merge_polygon, file = "nairobi_merge_polygon.csv")
+
+manchester_merge_point <- dbGetQuery(connection, "select * from manchester_merge_point")
+manchester_merge_line <- dbGetQuery(connection, "select * from manchester_merge_line")
+manchester_merge_polygon <- dbGetQuery(connection, "select * from manchester_merge_point")
+
+write.csv(manchester_merge_point, file = "manchester_merge_point.csv")
+write.csv(manchester_merge_line, file = "manchester_merge_line.csv")
+write.csv(manchester_merge_polygon, file = "manchester_merge_polygon.csv")
 
 
 

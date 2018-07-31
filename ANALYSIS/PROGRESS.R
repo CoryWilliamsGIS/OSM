@@ -11,6 +11,7 @@ library("readxl")
 Nairobi <- read_excel("Case_study_common_data.xlsx", sheet = "Nairobi")   
 GM_PCA <- read_excel("Case_study_common_data.xlsx", sheet = "GM_PCA")
 GM_PCA <- GM_PCA[,-1]
+gm_sum <- read_excel("Manchester_ward_data_summary.xlsx", sheet = "Manchester_ward_data_summary") 
 
 #GM_PCA <- GM_PCA[,-15:-16]
 #res <- cor(GM_PCA)
@@ -20,7 +21,15 @@ GM_PCA <- GM_PCA[,-1]
 Manchester_ward_tags <- read_excel("casestudy_ward_tags.xlsx", sheet = "New_Greater_Manchester")
 Manchester_ward_tags1 <- Manchester_ward_tags[, c(50,1:49)]
 
-
+#distinct users per ward
+#read in excel file which you have exported each in
+m_uid <- read_excel("m_uid_poi1.xlsx", sheet = "overalll") 
+#count unique per ward
+#remember to minus one from each column value as blank / NA is counted as 1 unique value
+gmz <- lengths(lapply(m_uid, unique))
+#better to copy and paste
+#copy and paste into excel using the formula =RIGHT(A1,SUM(LEN(A1) - LEN(SUBSTITUTE(A1, {"0","1","2","3","4","5","6","7","8","9"},"")))) to extract the number
+as.data.frame(gmz)
 
 
 #--E05000654 - crompton_bolton
@@ -82,6 +91,7 @@ m_tag_apartment <- Manchester_ward_tags[,42:43]
 m_tag_house <- Manchester_ward_tags[,44:45]
 m_tag_church <- Manchester_ward_tags[,46:47]
 m_tag_mosque <- Manchester_ward_tags[,48:49]
+m_tag_unique_users <- gm_sum[,1:6]
 
 m_tag_drinking_water[is.na(m_tag_drinking_water)] <- 0
 
@@ -91,6 +101,7 @@ m_tag_drinking_water[is.na(m_tag_drinking_water)] <- 0
 m_tag1 <- m_tag_begin
 
 #join each tag 
+m_tag1 <- left_join(m_tag1, m_tag_unique_users, by=c("ward"="WARD"))
 m_tag1 <- left_join(m_tag1, m_tag_school, by=c("ward"="ward1"))  
 m_tag1 <- left_join(m_tag1, m_tag_college, by=c("ward"="ward2"))  
 m_tag1 <- left_join(m_tag1, m_tag_pub, by=c("ward"="ward3"))  
@@ -115,6 +126,7 @@ m_tag1 <- left_join(m_tag1, m_tag_apartment, by=c("ward"="ward21"))
 m_tag1 <- left_join(m_tag1, m_tag_house, by=c("ward"="ward22"))  
 m_tag1 <- left_join(m_tag1, m_tag_church, by=c("ward"="ward23"))  
 m_tag1 <- left_join(m_tag1, m_tag_mosque, by=c("ward"="ward24"))
+
 
 #backup the original 
 m_tag2 <- m_tag1
@@ -539,6 +551,7 @@ n_tag_house <- Nairobi_ward_tags[,44:45]
 n_tag_church <- Nairobi_ward_tags[,46:47]
 n_tag_mosque <- Nairobi_ward_tags[,48:49]
 n_tag_unique_users <- n_sum[,1:6]
+
 
 #join back together, 
 

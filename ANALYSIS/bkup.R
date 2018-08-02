@@ -1,3 +1,7 @@
+install.packages("caret")
+library(caret)
+install.packages("pls")
+library(pls)
 library(rgdal)
 library(dplyr)
 library(ggplot2)
@@ -514,6 +518,8 @@ as.data.frame(z)
 Nairobi <- Nairobi[, c(-1,-3,-4,-7,-12:-15, -26:-28, -30, -32, -36, -39)  ]
 
 
+ft_density <- n_sum$`Feature Density(per km2)` 
+n_sum$population_density <- n_sum$population/n_sum$`Area (km2)`
 
 
 
@@ -630,15 +636,15 @@ corrplot(indepcor2$r, type="upper", order="hclust",
 
 n_indepcor1 <- n_indepcor
 names(n_indepcor1) <- c("pop", "avg hh size", "total hh",
-               "sex ratio" , "5-14yrs" ,  "15-17yrs",
-               "25+yrs",   "%U18" , "%18-64" ,
-               "%+64",  "% hh 1-3",  "% hh 4-6" ,      
-               "% hh +7" ,  "% hh own home")
+                        "sex ratio" , "5-14yrs" ,  "15-17yrs",
+                        "25+yrs",   "%U18" , "%18-64" ,
+                        "%+64",  "% hh 1-3",  "% hh 4-6" ,      
+                        "% hh +7" ,  "% hh own home")
 n_indepcor <- n_indepcor[,-1]               
 n_indepcor1 <- data.frame(sapply(n_indepcor1, function(x) as.numeric(as.character(x))))          
 n_res1 <- cor(n_indepcor1)
 round(n_res1, 3)              
-               
+
 n_indepcor11 <- rcorr(as.matrix(n_indepcor1))         
 
 n_indepcor11[lower.tri(n_indepcor11,diag=TRUE)]=NA  #Prepare to drop duplicates and meaningless information
@@ -649,8 +655,8 @@ n_indepcor11=n_indepcor11[order(-abs(n_indepcor11$Freq)),]    #Sort by highest c
 n_indepcor11
 library(reshape)
 
-          
-  indepcor2
+
+indepcor2
 corrplot(n_indepcor11$r, type="upper", order="hclust", 
          addCoef.col = "black",
          p.mat = n_indepcor11$P, sig.level = 0.1, insig = "blank")
@@ -665,7 +671,7 @@ library(corrgram)
 corrgram(n_indepcor2)
 
 n_r
-         
+
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))   
 corrplot(indepcor2$r, method="color", col=col(200),  
          type="upper", order="hclust", 
@@ -676,9 +682,9 @@ corrplot(indepcor2$r, method="color", col=col(200),
          # hide correlation coefficient on the principal diagonal
          diag=FALSE 
 )     
-         
-         
-        # p.mat = indepcor2$P, sig.level = 0.1, insig = "blank")
+
+
+# p.mat = indepcor2$P, sig.level = 0.1, insig = "blank")
 
 #same for dependent values (could be amazing diss did this - check?)
 #View(depcor)
@@ -720,56 +726,56 @@ n_lm_osmuid <- lm(nairobi_join$`Distinct osm_users` ~nairobi_join$`total populat
                     nairobi_join$pp_hh)
 
 n_lm_totaledits <- lm(nairobi_join$`total edits` ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                    nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                    nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                    nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                    nairobi_join$`% of primary school attendance (6-13)`+ 
-                    nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                    nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                    nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                    nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                    nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                    nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                    nairobi_join$pp_hh)
+                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                        nairobi_join$`% of primary school attendance (6-13)`+ 
+                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                        nairobi_join$pp_hh)
 
 n_lm_point <- lm(nairobi_join$Point_Count ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                   nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                   nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                   nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                   nairobi_join$`% of primary school attendance (6-13)`+ 
+                   nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                   nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                   nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                   nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                   nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                   nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                   nairobi_join$pp_hh)
 
 n_lm_line <- lm(nairobi_join$Line_Count ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                  nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                  nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                  nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                  nairobi_join$`% of primary school attendance (6-13)`+ 
+                  nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                  nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                  nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                  nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                  nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                  nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                  nairobi_join$pp_hh)
 
 n_lm_polygon <- lm(nairobi_join$Polygon_Count ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                     nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                     nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                     nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                     nairobi_join$`% of primary school attendance (6-13)`+ 
+                     nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                     nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                     nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                     nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                     nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                     nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                     nairobi_join$pp_hh)
 
 n_lm_school <- lm(nairobi_join$School~nairobi_join$`total population`+ 
                     nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
@@ -785,134 +791,134 @@ n_lm_school <- lm(nairobi_join$School~nairobi_join$`total population`+
                     nairobi_join$pp_hh)
 
 n_lm_college <- lm(nairobi_join$College ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                     nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                     nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                     nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                     nairobi_join$`% of primary school attendance (6-13)`+ 
+                     nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                     nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                     nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                     nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                     nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                     nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                     nairobi_join$pp_hh)
 
 n_lm_pub <- lm(nairobi_join$Pub ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                 nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                 nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                 nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                 nairobi_join$`% of primary school attendance (6-13)`+ 
+                 nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                 nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                 nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                 nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                 nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                 nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                 nairobi_join$pp_hh)
 
 n_lm_bar <- lm(nairobi_join$Bar ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                 nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                 nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                 nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                 nairobi_join$`% of primary school attendance (6-13)`+ 
+                 nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                 nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                 nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                 nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                 nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                 nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                 nairobi_join$pp_hh)
 
 n_lm_pharmacy <- lm(nairobi_join$Pharmacy ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                      nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                      nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                      nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                      nairobi_join$`% of primary school attendance (6-13)`+ 
+                      nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                      nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                      nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                      nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                      nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                      nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                      nairobi_join$pp_hh)
 
 n_lm_hospital <- lm(nairobi_join$Hospital ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                      nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                      nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                      nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                      nairobi_join$`% of primary school attendance (6-13)`+ 
+                      nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                      nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                      nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                      nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                      nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                      nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                      nairobi_join$pp_hh)
 
 n_lm_dentist <- lm(nairobi_join$Dentist ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                     nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                     nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                     nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                     nairobi_join$`% of primary school attendance (6-13)`+ 
+                     nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                     nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                     nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                     nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                     nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                     nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                     nairobi_join$pp_hh)
 
 n_lm_clinic <- lm(nairobi_join$Clinic ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                    nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                    nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                    nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                    nairobi_join$`% of primary school attendance (6-13)`+ 
+                    nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                    nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                    nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                    nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                    nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                    nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                    nairobi_join$pp_hh)
 
 n_lm_police <- lm(nairobi_join$Police ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                    nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                    nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                    nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                    nairobi_join$`% of primary school attendance (6-13)`+ 
+                    nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                    nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                    nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                    nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                    nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                    nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                    nairobi_join$pp_hh)
 
 n_lm_bank <- lm(nairobi_join$Bank ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                  nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                  nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                  nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                  nairobi_join$`% of primary school attendance (6-13)`+ 
+                  nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                  nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                  nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                  nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                  nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                  nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                  nairobi_join$pp_hh)
 
 n_lm_atm <- lm(nairobi_join$ATM ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                 nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                 nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                 nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                 nairobi_join$`% of primary school attendance (6-13)`+ 
+                 nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                 nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                 nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                 nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                 nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                 nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                 nairobi_join$pp_hh)
 
 n_lm_restaurant <- lm(nairobi_join$Restaurant ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
                         nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
@@ -928,69 +934,69 @@ n_lm_restaurant <- lm(nairobi_join$Restaurant ~nairobi_join$`total population`+ 
                         nairobi_join$pp_hh)
 
 n_lm_fastfood<- lm(nairobi_join$`Fast Food` ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                     nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                     nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                     nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                     nairobi_join$`% of primary school attendance (6-13)`+ 
+                     nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                     nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                     nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                     nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                     nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                     nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                     nairobi_join$pp_hh)
 
 n_lm_toilets <- lm(nairobi_join$Toilets ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                     nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                     nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                     nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                     nairobi_join$`% of primary school attendance (6-13)`+ 
+                     nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                     nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                     nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                     nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                     nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                     nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                     nairobi_join$pp_hh)
 
 n_lm_drinkingwater <- lm(nairobi_join$`Drinking Water` ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                           nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                           nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                           nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                           nairobi_join$`% of primary school attendance (6-13)`+ 
+                           nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                           nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                           nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                           nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                           nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                           nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                           nairobi_join$pp_hh)
 
 n_lm_placeofworship <- lm(nairobi_join$`Place of Worship` ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                            nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                            nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                            nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                            nairobi_join$`% of primary school attendance (6-13)`+ 
+                            nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                            nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                            nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                            nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                            nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                            nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                            nairobi_join$pp_hh)
 
 n_lm_busstop <- lm(nairobi_join$Bus_Stop ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                     nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                     nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                     nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                     nairobi_join$`% of primary school attendance (6-13)`+ 
+                     nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                     nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                     nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                     nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                     nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                     nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                     nairobi_join$pp_hh)
 
 n_lm_streetlamp <- lm(nairobi_join$`Street Lamp` ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
                         nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
@@ -1006,17 +1012,17 @@ n_lm_streetlamp <- lm(nairobi_join$`Street Lamp` ~nairobi_join$`total population
                         nairobi_join$pp_hh)
 
 n_lm_hotel <- lm(nairobi_join$Hotel ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                   nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                   nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                   nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                   nairobi_join$`% of primary school attendance (6-13)`+ 
+                   nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                   nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                   nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                   nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                   nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                   nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                   nairobi_join$pp_hh)
 
 n_lm_industrial <- lm(nairobi_join$Industrial ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
                         nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
@@ -1045,43 +1051,43 @@ n_lm_apartments <- lm(nairobi_join$Apartments ~nairobi_join$`total population`+ 
                         nairobi_join$pp_hh)
 
 n_lm_house <- lm(nairobi_join$House ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                   nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                   nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                   nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                   nairobi_join$`% of primary school attendance (6-13)`+ 
+                   nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                   nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                   nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                   nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                   nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                   nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                   nairobi_join$pp_hh)
 
 n_lm_church <- lm(nairobi_join$Church ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                    nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                    nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                    nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                    nairobi_join$`% of primary school attendance (6-13)`+ 
+                    nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                    nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                    nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                    nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                    nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                    nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                    nairobi_join$pp_hh)
 
 n_lm_mosque <- lm(nairobi_join$Mosque ~nairobi_join$`total population`+ nairobi_join$`total population`+ 
-                        nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
-                        nairobi_join$`total male population`+ nairobi_join$`total households`+ 
-                        nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
-                        nairobi_join$`% of primary school attendance (6-13)`+ 
-                        nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
-                        nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
-                        nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
-                        nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
-                        nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
-                        nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
-                        nairobi_join$pp_hh)
+                    nairobi_join$`total population in poverty`+ nairobi_join$`total female population`+ 
+                    nairobi_join$`total male population`+ nairobi_join$`total households`+ 
+                    nairobi_join$`total working people`+ nairobi_join$`general sex ratio (females to males)`+ 
+                    nairobi_join$`% of primary school attendance (6-13)`+ 
+                    nairobi_join$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join$`education level index`+ 
+                    nairobi_join$`% households owning own livestock`+ nairobi_join$`% population U18`+ nairobi_join$`% pop 18-64`+ 
+                    nairobi_join$`% pop over 64`+ nairobi_join$`% households with 1-3 people`+ nairobi_join$`% households with 4-6 people`+ 
+                    nairobi_join$`% households with 7+ people`+ nairobi_join$`% of female headed households`+ 
+                    nairobi_join$`% of households owning house they live in`+ nairobi_join$`% Employment Rate`+ 
+                    nairobi_join$`% access to safe water source`+ nairobi_join$`% access to improved sanitation`+ 
+                    nairobi_join$pp_hh)
 
 summary(n_lm_osmuid) 
 summary(n_lm_totaledits)
@@ -1173,8 +1179,40 @@ tm_shape(n_local_moran_map) + tm_fill(col = "Ii", style = "quantile", title = "L
 
 plot(nairobi_wardshp2)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #.rs.restartR()
 
+
+View(n_indepdf)
+
+
+
+
+library("pls")
+y <- data.frame(sapply(y, function(x) as.numeric(as.character(x))))
+highlyCorrelated <- findCorrelation(r, cutoff=0.7)
+highlyCorrelated <- findCorrelation(cor(y), cutoff = .70, verbose = FALSE)
+bhb <- as.data.frame(highlyCorrelated)
+View(bhb)
 
 
 
@@ -1182,10 +1220,12 @@ plot(nairobi_wardshp2)
 nairobi_join$`total population`
 
 n_indepdf
+y <- n_indepdf[,-1]
+y <- as.numeric(y)
 
 x <- n_indepdf[,-1:-7]
 x$dep_pop <- nairobi_join$`total population`
 
 gas1 <- pcr(dep_pop ~., ncomp = 17, data = x, validation = "LOO")
-
-library("pls")
+summary(gas1)
+plot(RMSEP(gas1), legendpos = "topright")

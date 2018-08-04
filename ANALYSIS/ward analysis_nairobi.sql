@@ -12,6 +12,14 @@ FROM public.nairobi_wards_polys LEFT JOIN public.nairobi_final_poi3
 ON st_contains(public.nairobi_wards_polys.geom, public.nairobi_final_poi3.way) 
 GROUP BY public.nairobi_wards_polys.name;
 
+--distinct users 
+--export as csv
+--repeat for the other tables
+SELECT public.nairobi_wards_polys.name, string_agg(distinct public.nairobi_final_poi3.osm_uid, ' ') AS total
+FROM public.nairobi_wards_polys LEFT JOIN public.nairobi_final_poi3 
+ON st_contains(public.nairobi_wards_polys.geom, public.nairobi_final_poi3.way) 
+GROUP BY public.nairobi_wards_polys.name 
+
 --total line in each ward, group by ward name
 SELECT public.nairobi_wards_polys.name, count(public.nairobi_final_line3.way) AS total
 FROM public.nairobi_wards_polys LEFT JOIN public.nairobi_final_line3

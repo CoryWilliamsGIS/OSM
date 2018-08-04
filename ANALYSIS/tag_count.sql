@@ -38,6 +38,13 @@ select aeroway, count(*) from manc_final_polygon3 where aeroway is not null
 group by aeroway
 order by count desc 
 
+SELECT public.nairobi_wards_polys.name, count(public.nairobi_final_poi3.way) AS total
+FROM public.nairobi_wards_polys LEFT JOIN public.nairobi_final_poi3 
+ON st_contains(public.nairobi_wards_polys.geom, public.nairobi_final_poi3.way) 
+WHERE public.nairobi_final_poi3.amenity = 'restaurant'
+GROUP BY public.nairobi_wards_polys.name;
+
+
 select amenity, count(*) from manc_final_polygon3 where amenity is not null
 group by amenity
 order by count desc 

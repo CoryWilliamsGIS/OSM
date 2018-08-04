@@ -138,7 +138,7 @@ m_tag2 <- m_tag1
 #change na to 0
 m_tag2[is.na(m_tag2)] <- 0
 
-write.csv(m_tag2, file = "Manchester_wards_whatismapped.csv")
+#write.csv(m_tag2, file = "Manchester_wards_whatismapped.csv")
 
 depdf <- m_tag2
 indepdf <- GM_PCA
@@ -179,8 +179,10 @@ join <- left_join(indepdf, depdf, by=c("Ward name"="ward"))
 #count of buildings
 #the more summary things
 
-
-
+rescale <- function(x) (x-min(x))/(max(x) - min(x)) * 100
+population <- indepdf$population
+population <- rescale(as.numeric(population))
+indepdf$population <- population
 
 indepcor <- indepdf
 depcor <- depdf
@@ -190,9 +192,19 @@ indepcor <- indepcor[,-1:-2]
 indepcor2 <- rcorr(as.matrix(indepcor))
 indepcor2
 indepcor2$r
+mr <- as.data.frame(indepcor2$r)
+View(mr)
+indepcor <- indepcor[c(-2,-3,-5:-7, -12, -13), c(-2,-3,-5:-7, -12, -13)]
+indepdf <- indepdf
+View(indepdf)
+#3 5 6 7 maybe 2 12 13 
 
-res <- cor(indepcor)
-round(res, 3)
+#ADD ADDITIONAL VARIABLES TO MANCHESTER!!!!!! MAKE USE OF GREAT DATA IN UK 
+
+
+
+#res <- cor(indepcor)
+#round(res, 3)
 
 library("corrplot")
 
@@ -338,7 +350,7 @@ library(C50)
 library(leaps)
 library(psych)
 
-
+#cite malawai
 rescale <- function(x) (x-min(x))/(max(x) - min(x)) * 100
 
 
@@ -517,10 +529,11 @@ as.data.frame(z)
 #subset
 Nairobi <- Nairobi[, c(-1,-3,-4,-7,-12:-15, -26:-28, -30, -32, -36, -39)  ]
 
-
-ft_density <- n_sum$`Feature Density(per km2)` 
+View(n_sum)
+names(n_sum)[8] <- "ft_density_km2"
+ft_density <- n_sum$ft_density_km2
 n_sum$population_density <- n_sum$population/n_sum$`Area (km2)`
-
+pop_density <- n_sum$population_density
 
 
 #finish formatting later

@@ -40,6 +40,7 @@ xxxcor <- rcorr(as.matrix(xxx))
 xxxcor2 <- rcorr(as.matrix(xxx))
 xxxcor <- data.frame(sapply(xxxcor, function(x) as.numeric(as.character(x))))
 
+
 corrplot(xxxcor2$r, type="upper", order="hclust", 
          addCoef.col = "black")
 
@@ -49,6 +50,8 @@ write.csv(nairobi_join3, file = "Nairobi_join3.csv")
 
 
 View(a)
+
+#https://www.statmethods.net/stats/regression.html
 
 ###
 nairobi_join3 <- nairobi_join
@@ -73,8 +76,8 @@ n_lm_osmuid <- lm(nairobi_join3$`Distinct osm_users` ~nairobi_join3$`total popul
                     nairobi_join3$`% households with 1-3 people`+
                     nairobi_join3$`% of female headed households`+ 
                     nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                    nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+
-                    nairobi_join3$pop_density)#############
+                    nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`
+                    )#############
 
 n_lm_totaledits <- lm(nairobi_join3$`total edits` ~nairobi_join3$`total population`+  
                     nairobi_join3$`general sex ratio (females to males)`+ 
@@ -84,8 +87,8 @@ n_lm_totaledits <- lm(nairobi_join3$`total edits` ~nairobi_join3$`total populati
                     nairobi_join3$`% households with 1-3 people`+
                     nairobi_join3$`% of female headed households`+ 
                     nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                    nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+
-                      nairobi_join3$pop_density)
+                    nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`
+)
 
 n_lm_point <- lm(nairobi_join3$Point_Count ~nairobi_join3$`total population`+  
                         nairobi_join3$`general sex ratio (females to males)`+ 
@@ -95,9 +98,9 @@ n_lm_point <- lm(nairobi_join3$Point_Count ~nairobi_join3$`total population`+
                         nairobi_join3$`% households with 1-3 people`+
                         nairobi_join3$`% of female headed households`+ 
                         nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                        nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+
-                   nairobi_join3$pop_density)
-
+                        nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`
+)
+                 
 n_lm_line <- lm(nairobi_join3$Line_Count ~nairobi_join3$`total population`+  
                         nairobi_join3$`general sex ratio (females to males)`+ 
                         nairobi_join3$`% of primary school attendance (6-13)`+ 
@@ -106,8 +109,8 @@ n_lm_line <- lm(nairobi_join3$Line_Count ~nairobi_join3$`total population`+
                         nairobi_join3$`% households with 1-3 people`+
                         nairobi_join3$`% of female headed households`+ 
                         nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                        nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+
-                  nairobi_join3$pop_density)
+                        nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`
+                  )
 
 n_lm_polygon <- lm(nairobi_join3$Polygon_Count ~nairobi_join3$`total population`+  
                         nairobi_join3$`general sex ratio (females to males)`+ 
@@ -117,8 +120,8 @@ n_lm_polygon <- lm(nairobi_join3$Polygon_Count ~nairobi_join3$`total population`
                         nairobi_join3$`% households with 1-3 people`+
                         nairobi_join3$`% of female headed households`+ 
                         nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                        nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+
-                     nairobi_join3$pop_density)
+                        nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`
+                     )
 
 n_lm_ftdensity <- lm(nairobi_join3$ft_density ~nairobi_join3$`total population`+  
                      nairobi_join3$`general sex ratio (females to males)`+ 
@@ -128,8 +131,8 @@ n_lm_ftdensity <- lm(nairobi_join3$ft_density ~nairobi_join3$`total population`+
                      nairobi_join3$`% households with 1-3 people`+
                      nairobi_join3$`% of female headed households`+ 
                      nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                     nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+
-                     nairobi_join3$pop_density)
+                     nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`
+                     )
 
 n_lm_school<- lm(nairobi_join3$School ~nairobi_join3$`total population`+  
                         nairobi_join3$`general sex ratio (females to males)`+ 
@@ -139,8 +142,8 @@ n_lm_school<- lm(nairobi_join3$School ~nairobi_join3$`total population`+
                         nairobi_join3$`% households with 1-3 people`+
                         nairobi_join3$`% of female headed households`+ 
                         nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                        nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+
-                   nairobi_join3$pop_density)
+                        nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`
+                   )
 
 n_lm_college <- lm(nairobi_join3$College ~nairobi_join3$`total population`+  
                         nairobi_join3$`general sex ratio (females to males)`+ 
@@ -150,7 +153,7 @@ n_lm_college <- lm(nairobi_join3$College ~nairobi_join3$`total population`+
                         nairobi_join3$`% households with 1-3 people`+
                         nairobi_join3$`% of female headed households`+ 
                         nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                        nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density)
+                        nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`)
 
 n_lm_pub <- lm(nairobi_join3$Pub ~nairobi_join3$`total population`+  
                         nairobi_join3$`general sex ratio (females to males)`+ 
@@ -160,7 +163,7 @@ n_lm_pub <- lm(nairobi_join3$Pub ~nairobi_join3$`total population`+
                         nairobi_join3$`% households with 1-3 people`+
                         nairobi_join3$`% of female headed households`+ 
                         nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                        nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density)
+                        nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`)
 
 n_lm_bar <- lm(nairobi_join3$Bar ~nairobi_join3$`total population`+  
                  nairobi_join3$`general sex ratio (females to males)`+ 
@@ -170,7 +173,7 @@ n_lm_bar <- lm(nairobi_join3$Bar ~nairobi_join3$`total population`+
                  nairobi_join3$`% households with 1-3 people`+
                  nairobi_join3$`% of female headed households`+ 
                  nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density)
+                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`)
 
 n_lm_pharmacy <- lm(nairobi_join3$Pharmacy ~nairobi_join3$`total population`+  
                  nairobi_join3$`general sex ratio (females to males)`+ 
@@ -180,7 +183,7 @@ n_lm_pharmacy <- lm(nairobi_join3$Pharmacy ~nairobi_join3$`total population`+
                  nairobi_join3$`% households with 1-3 people`+
                  nairobi_join3$`% of female headed households`+ 
                  nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density)
+                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`)
 
 n_lm_hospital <- lm(nairobi_join3$Hospital ~nairobi_join3$`total population`+  
                  nairobi_join3$`general sex ratio (females to males)`+ 
@@ -190,7 +193,7 @@ n_lm_hospital <- lm(nairobi_join3$Hospital ~nairobi_join3$`total population`+
                  nairobi_join3$`% households with 1-3 people`+
                  nairobi_join3$`% of female headed households`+ 
                  nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density)
+                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`)
 
 n_lm_dentist <- lm(nairobi_join3$Dentist ~nairobi_join3$`total population`+  
                  nairobi_join3$`general sex ratio (females to males)`+ 
@@ -200,7 +203,7 @@ n_lm_dentist <- lm(nairobi_join3$Dentist ~nairobi_join3$`total population`+
                  nairobi_join3$`% households with 1-3 people`+
                  nairobi_join3$`% of female headed households`+ 
                  nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density)
+                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`)
 
 n_lm_clinic <- lm(nairobi_join3$Clinic ~nairobi_join3$`total population`+  
                  nairobi_join3$`general sex ratio (females to males)`+ 
@@ -210,7 +213,7 @@ n_lm_clinic <- lm(nairobi_join3$Clinic ~nairobi_join3$`total population`+
                  nairobi_join3$`% households with 1-3 people`+
                  nairobi_join3$`% of female headed households`+ 
                  nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density)
+                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`)
 
 n_lm_police <- lm(nairobi_join3$Police ~nairobi_join3$`total population`+  
                  nairobi_join3$`general sex ratio (females to males)`+ 
@@ -220,7 +223,7 @@ n_lm_police <- lm(nairobi_join3$Police ~nairobi_join3$`total population`+
                  nairobi_join3$`% households with 1-3 people`+
                  nairobi_join3$`% of female headed households`+ 
                  nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density)
+                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`)
 
 n_lm_bank <- lm(nairobi_join3$Bank ~nairobi_join3$`total population`+  
                  nairobi_join3$`general sex ratio (females to males)`+ 
@@ -230,7 +233,7 @@ n_lm_bank <- lm(nairobi_join3$Bank ~nairobi_join3$`total population`+
                  nairobi_join3$`% households with 1-3 people`+
                  nairobi_join3$`% of female headed households`+ 
                  nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density)
+                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`)
 
 n_lm_atm<- lm(nairobi_join3$ATM ~nairobi_join3$`total population`+  
                  nairobi_join3$`general sex ratio (females to males)`+ 
@@ -240,7 +243,7 @@ n_lm_atm<- lm(nairobi_join3$ATM ~nairobi_join3$`total population`+
                  nairobi_join3$`% households with 1-3 people`+
                  nairobi_join3$`% of female headed households`+ 
                  nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density)
+                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`)
 
 n_lm_restaurant <- lm(nairobi_join3$Restaurant ~nairobi_join3$`total population`+  
                  nairobi_join3$`general sex ratio (females to males)`+ 
@@ -250,7 +253,7 @@ n_lm_restaurant <- lm(nairobi_join3$Restaurant ~nairobi_join3$`total population`
                  nairobi_join3$`% households with 1-3 people`+
                  nairobi_join3$`% of female headed households`+ 
                  nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density)
+                 nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`)
 
 n_lm_fastfood <- lm(nairobi_join3$`Fast Food` ~nairobi_join3$`total population`+  
                  nairobi_join3$`general sex ratio (females to males)`+ 

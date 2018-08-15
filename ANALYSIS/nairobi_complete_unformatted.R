@@ -723,23 +723,25 @@ n_tag1 <- left_join(n_tag1, n_tag_mosque, by=c("CONSTITUEN"="constituen24"))
 n_tag2 <- n_tag1
 
 
+
 n_tag2[is.na(n_tag2)] <- 0
 
 n_depdf <- n_tag2
 n_indepdf <- Nairobi2
-
+#View(n_indepdf)
 nairobi_join <- left_join(n_indepdf, n_depdf, by=c("CONSTITUEN"="CONSTITUEN"))
 
 nairobi_join$pp_hh <- as.numeric(nairobi_join$population)/as.numeric(nairobi_join$tot_hh)
 
 n_indepcor <- n_indepdf
 n_depcor <- n_depdf
+
 library("Hmisc")
-#pcor <- n_indepcor[,-1]
+n_indepcor <- n_indepcor[,-1]
 n_indepcor2 <- rcorr(as.matrix(n_indepcor))
 n_indepcor2
 r <- as.data.frame(n_indepcor2$r)
-View(r)
+#View(r)
 #change from character df to numeric matrix
 n_indepcor <- data.frame(sapply(n_indepcor, function(x) as.numeric(as.character(x))))
 n_res <- cor(n_indepcor)
@@ -748,7 +750,7 @@ round(n_res, 3)
 Nairobi2$employment_rate <- (Nairobi2$tot_working_ppl/Nairobi2$population)*100
 x <- rcorr(as.matrix(Nairobi2[,2:29]))
 xx <- as.data.frame(x$r)
-View(xx)
+#View(xx)
 xx <- xx[-2:-4,-2:-4]
 xx<- xx[c(-9,-4,-6,-12,-19,-21,-22:-24), c(-9,-4,-6,-12,-19,-21,-22:-24)]
 
@@ -761,35 +763,54 @@ library("corrplot")
 
 nairobi_join2 <- nairobi_join
 
+
+
+#rescaling not necessary - correlationn does not change
 rescale <- function(x) (x-min(x))/(max(x) - min(x)) * 100
 names(n_const_sum)[8] <- "ft_density"
 nairobi_join2$ft_density <- n_const_sum$ft_density
 nairobi_join2$employment_rate <- (nairobi_join2$tot_working_ppl / nairobi_join2$population)*100
-rs_total_pop <- rescale(as.numeric(nairobi_join2$population))
-nairobi_join2$population <- rs_total_pop
+
+
 pop_density <- nairobi_join$population / n_const_sum$`Area (km2)`
-#rescale(pop_density)
+
+
 nairobi_join2$pop_density <- pop_density
 names(nairobi_join2)[24] <- "education level index"
 
-names(nairobi_join2)[61] <- "% Employment Rate"
+#names(nairobi_join2)[61] <- "% Employment Rate"
 nairobi_bkup <- nairobi_join2
 
 
 
 nairobi_join3 <- data.frame(sapply(nairobi_join2, function(x) as.numeric(as.character(x))))
-#colnames(nairobi_join3) <- colnames(nairobi_join2)
+
 nairobi_names <- colnames(nairobi_join2)
 colnames(nairobi_join3) <- nairobi_names
 
 nairobi_join3 <- nairobi_join3[,-1]
-nairobi_join3 <- nairobi_join3[,-28]
+
 nairobi_join3 <- as.data.frame(nairobi_join3)
 is.data.frame(nairobi_join3)
 
 #nairobi_join3 <- as.matrix(nairobi_join3)
+#nairobi_const_join3$`total edits`
 
-
+n_lm_osmuid <-
+  lm(
+    nairobi_join3$`Distinct osm_users` ~ nairobi_join3$population +
+      nairobi_join3$`general sex ratio (females to males)` +
+      nairobi_join3$`% of primary school attendance (6-13)` +
+      nairobi_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_join3$`education level index` +
+      nairobi_join3$`% households owning own livestock` +
+      nairobi_join3$`% pop 18-64` +
+      nairobi_join3$`% households with 1-3 people` +
+      nairobi_join3$`% of female headed households` +
+      nairobi_join3$`% of households owning house they live in` +
+      nairobi_join3$employment_rate +
+      nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
+  )
 
 n_lm_totaledits <-
   lm(
@@ -803,7 +824,7 @@ n_lm_totaledits <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -819,7 +840,7 @@ n_lm_point <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -835,7 +856,7 @@ n_lm_line <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -851,7 +872,7 @@ n_lm_polygon <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -867,7 +888,7 @@ n_lm_ft_density <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -883,7 +904,7 @@ n_lm_school <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -899,7 +920,7 @@ n_lm_college <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -915,7 +936,7 @@ n_lm_pub <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -932,7 +953,7 @@ n_lm_bar <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -948,7 +969,7 @@ n_lm_pharmacy <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -964,7 +985,7 @@ n_lm_hospital <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -980,7 +1001,7 @@ n_lm_dentist <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -996,7 +1017,7 @@ n_lm_clinic <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1013,7 +1034,7 @@ n_lm_police <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1029,7 +1050,7 @@ n_lm_bank <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1046,7 +1067,7 @@ n_lm_atm <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1062,7 +1083,7 @@ n_lm_restaurant <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1078,7 +1099,7 @@ n_lm_fastfood <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1094,7 +1115,7 @@ n_lm_toilets <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1110,7 +1131,7 @@ n_lm_drinkingwater <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1126,7 +1147,7 @@ n_lm_placeofworship <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1143,7 +1164,7 @@ n_lm_busstop <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1160,7 +1181,7 @@ n_lm_streetlmap <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1177,7 +1198,7 @@ n_lm_hotel <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1194,7 +1215,7 @@ n_lm_industrial <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1210,7 +1231,7 @@ n_lm_apartments <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1226,7 +1247,7 @@ n_lm_house <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1242,7 +1263,7 @@ n_lm_church <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
@@ -1258,11 +1279,11 @@ n_lm_mosque <-
       nairobi_join3$`% households with 1-3 people` +
       nairobi_join3$`% of female headed households` +
       nairobi_join3$`% of households owning house they live in` +
-      nairobi_join3$`% Employment Rate` +
+      nairobi_join3$employment_rate +
       nairobi_join3$`% access to safe water source` + nairobi_join3$`% access to improved sanitation` + nairobi_join3$pop_density
   )
 
-#summary(n_lm_osmuid) 
+summary(n_lm_osmuid) 
 summary(n_lm_totaledits)
 summary(n_lm_point)
 summary(n_lm_line)
@@ -1485,6 +1506,27 @@ is.data.frame(nairobi_const_join3)
 #employ, 
 #pop dens,
 #livestocl
+
+
+
+n_lm_osmiud <-
+  lm(
+    nairobi_const_join3$`Distinct osm_users` ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density+
+      nairobi_const_join3$`% of people living below the poverty line`
+  )
 
 
 n_lm_totaledits <-
@@ -2017,7 +2059,7 @@ n_lm_mosque <-
       nairobi_const_join3$pop_density
   )
 
-#summary(n_lm_osmuid) 
+summary(n_lm_osmuid) 
 summary(n_lm_totaledits)
 summary(n_lm_point)
 summary(n_lm_line)
@@ -2052,13 +2094,14 @@ summary(n_lm_mosque)
 
 #morans
 
-nairobi_constshp1 <- readOGR(dsn=".", layer = "nairobi_constituencies")
-plot(nairobi_constshp1)
-head(nairobi_constshp1@data)
-n_const_jointrial <- merge(nairobi_constshp1, nairobi_join3)
-drops_const <- c("CONST_CODE", "CONSTITUEN")
-nairobi_constshp2 <-  nairobi_constshp1[,!(names(nairobi_constshp1) %in% drops_const)]
-nairobi_constshp2@data
+# nairobi_constshp1 <- readOGR(dsn=".", layer = "nairobi_constituencies")
+# 
+# plot(nairobi_constshp1)
+# head(nairobi_constshp1@data)
+# n_const_jointrial <- merge(nairobi_constshp1, nairobi_join3)
+# drops_const <- c("CONST_CODE", "CONSTITUEN")
+# nairobi_constshp2 <-  nairobi_constshp1[,!(names(nairobi_constshp1) %in% drops_const)]
+# nairobi_constshp2@data
 
 
 
@@ -2106,3 +2149,1549 @@ moran.test(n_const_jointrial$`% access to improved sanitation` ,n_const_listw)#m
 moran.test(n_const_jointrial$pop_density ,n_const_listw)#moran I statistic --> -0.027
 
 #very low results... lets home manchester has more...
+
+
+res1 <- n_lm_totaledits$residuals
+n_const_jointrial2 <- n_const_jointrial
+n_const_jointrial2$total_edit_residuals <- res1
+plot(n_const_jointrial2$total_edit_residuals)
+
+
+moran.test(n_const_jointrial2$total_edit_residuals, n_const_listw)
+
+moran.test(n_lm_totaledits$residuals, n_const_listw)
+moran.test(n_lm_point$residuals, n_const_listw)
+moran.test(n_lm_line$residuals, n_const_listw)
+moran.test(n_lm_polygon$residuals, n_const_listw)
+moran.test(n_lm_ft_density$residuals, n_const_listw)
+moran.test(n_lm_school$residuals, n_const_listw)
+moran.test(n_lm_college$residuals, n_const_listw)
+moran.test(n_lm_pub$residuals, n_const_listw)
+moran.test(n_lm_bar$residuals, n_const_listw)
+moran.test(n_lm_pharmacy$residuals, n_const_listw)
+moran.test(n_lm_hospital$residuals, n_const_listw)
+moran.test(n_lm_dentist$residuals, n_const_listw)
+moran.test(n_lm_clinic$residuals, n_const_listw)
+moran.test(n_lm_police$residuals, n_const_listw)
+moran.test(n_lm_bank$residuals, n_const_listw)
+moran.test(n_lm_atm$residuals, n_const_listw)
+moran.test(n_lm_restaurant$residuals, n_const_listw)
+moran.test(n_lm_fastfood$residuals, n_const_listw)
+moran.test(n_lm_toilets$residuals, n_const_listw)
+moran.test(n_lm_drinkingwater$residuals, n_const_listw)
+moran.test(n_lm_placeofworship$residuals, n_const_listw)
+moran.test(n_lm_busstop$residuals, n_const_listw)
+moran.test(n_lm_streetlmap$residuals, n_const_listw)
+moran.test(n_lm_hotel$residuals, n_const_listw)
+moran.test(n_lm_industrial$residuals, n_const_listw)
+moran.test(n_lm_apartments$residuals, n_const_listw)
+moran.test(n_lm_house$residuals, n_const_listw)
+moran.test(n_lm_church$residuals, n_const_listw)
+moran.test(n_lm_mosque$residuals, n_const_listw)
+
+
+
+
+plot(n_lm_totaledits$residuals)
+plot(n_lm_point$residuals)
+plot(n_lm_line$residuals)
+plot(n_lm_polygon$residuals)
+plot(n_lm_ft_density$residuals)
+plot(n_lm_school$residuals)
+plot(n_lm_college$residuals)
+plot(n_lm_pub$residuals)### n_lm_pub
+plot(n_lm_bar$residuals)###
+plot(n_lm_pharmacy$residuals)
+plot(n_lm_hospital$residuals)
+plot(n_lm_dentist$residuals)
+plot(n_lm_clinic$residuals)
+plot(n_lm_police$residuals)
+plot(n_lm_bank$residuals)
+plot(n_lm_atm$residuals)
+plot(n_lm_restaurant$residuals)
+plot(n_lm_fastfood$residuals)
+plot(n_lm_toilets$residuals)
+plot(n_lm_drinkingwater$residuals)
+plot(n_lm_placeofworship$residuals)
+plot(n_lm_busstop$residuals)
+plot(n_lm_streetlmap$residuals)
+plot(n_lm_hotel$residuals)
+plot(n_lm_industrial$residuals)
+plot(n_lm_apartments$residuals)
+plot(n_lm_house$residuals)
+plot(n_lm_church$residuals)
+plot(n_lm_mosque$residuals)
+
+
+#dependent variables
+moran.test(nairobi_const_join3$`Distinct osm_users`, n_const_listw)#doesnt work
+moran.test(nairobi_const_join$`total edits`, n_const_listw)
+moran.test(nairobi_const_join$Point_Count, n_const_listw)
+moran.test(nairobi_const_join$Line_Count, n_const_listw)
+moran.test(nairobi_const_join$Polygon_Count, n_const_listw)
+moran.test(nairobi_const_join$ft_density, n_const_listw)
+moran.test(nairobi_const_join$School, n_const_listw)
+moran.test(nairobi_const_join$College, n_const_listw)
+moran.test(nairobi_const_join$Pub, n_const_listw)
+moran.test(nairobi_const_join$Bar, n_const_listw)
+moran.test(nairobi_const_join$Pharmacy, n_const_listw)
+moran.test(nairobi_const_join$Hospital, n_const_listw)
+moran.test(nairobi_const_join$Dentist, n_const_listw)
+moran.test(nairobi_const_join$Clinic, n_const_listw)
+moran.test(nairobi_const_join$Police, n_const_listw)
+moran.test(nairobi_const_join$Bank, n_const_listw)
+moran.test(nairobi_const_join$ATM, n_const_listw)
+moran.test(nairobi_const_join$Restaurant, n_const_listw)
+moran.test(nairobi_const_join$`Fast Food`, n_const_listw)
+moran.test(nairobi_const_join$Toilets, n_const_listw)
+moran.test(nairobi_const_join$`Place of Worship`, n_const_listw)
+moran.test(nairobi_const_join$Bus_Stop, n_const_listw)
+moran.test(nairobi_const_join$`Street Lamp`, n_const_listw)
+moran.test(nairobi_const_join$Hotel, n_const_listw)
+moran.test(nairobi_const_join$Industrial, n_const_listw)
+moran.test(nairobi_const_join$Apartments, n_const_listw)
+moran.test(nairobi_const_join$House, n_const_listw)
+moran.test(nairobi_const_join$Church, n_const_listw)
+moran.test(nairobi_const_join$Mosque, n_const_listw)
+
+
+
+
+
+library(lmtest)
+
+
+#p value > 0.05 = HETEROSKETASTIC
+bptest(n_lm_osmuid)
+bptest(n_lm_totaledits)
+bptest(n_lm_point)
+bptest(n_lm_line)
+bptest(n_lm_polygon)
+bptest(n_lm_ft_density)
+bptest(n_lm_school)
+bptest(n_lm_college)
+bptest(n_lm_pub)
+bptest(n_lm_bar)
+bptest(n_lm_pharmacy)
+bptest(n_lm_hospital)
+bptest(n_lm_dentist)
+bptest(n_lm_clinic)
+bptest(n_lm_police)
+bptest(n_lm_bank)
+bptest(n_lm_atm)
+bptest(n_lm_restaurant)
+bptest(n_lm_fastfood)
+bptest(n_lm_toilets)
+bptest(n_lm_drinkingwater)
+bptest(n_lm_placeofworship)
+bptest(n_lm_busstop)
+bptest(n_lm_streetlmap)
+bptest(n_lm_hotel)
+bptest(n_lm_industrial)
+bptest(n_lm_apartments)
+bptest(n_lm_house)
+bptest(n_lm_church)
+bptest(n_lm_mosque) #####HETEROSKEDASITY
+
+
+
+
+#GEOGRAPHICALLY WEIGHTED REGRESSION
+
+#calculate kernal bandwidth
+library("spgwr")
+
+gwrbandwidth.n_lm_osmuid <-
+  gwr.sel(
+    nairobi_const_join3$`Distinct osm_users` ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density,
+    data =n_const_jointrial,
+    adapt = T
+  )
+
+gwrbandwidth.n_lm_totaledis <-
+  gwr.sel(
+    nairobi_const_join3$`total edits` ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_point <-
+  gwr.sel(
+    nairobi_const_join3$Point_Count ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, adapt = T, data =n_const_jointrial
+  )
+
+gwrbandwidth.n_lm_line <-
+  gwr.sel(
+    nairobi_const_join3$Line_Count ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_polygon <-
+  gwr.sel(
+    nairobi_const_join3$Polygon_Count ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_ft_density <-
+  gwr.sel(
+    nairobi_const_join3$ft_density ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_school <-
+  gwr.sel(
+    nairobi_const_join3$School ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_college <-
+  gwr.sel(
+    nairobi_const_join3$College ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_pub <-
+  gwr.sel(
+    nairobi_const_join3$Pub ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+
+gwrbandwidth.n_lm_bar <-
+  gwr.sel(
+    nairobi_const_join3$Bar ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_pharmacy <-
+  gwr.sel(
+    nairobi_const_join3$Pharmacy ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_hospital <-
+  gwr.sel(
+    nairobi_const_join3$Hospital ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_dentist <-
+  gwr.sel(
+    nairobi_const_join3$Dentist ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_clinic <-
+  gwr.sel(
+    nairobi_const_join3$Clinic ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate ++
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+
+gwrbandwidth.n_lm_police <-
+  gwr.sel(
+    nairobi_const_join3$Police ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_bank <-
+  gwr.sel(
+    nairobi_const_join3$Bank ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+
+gwrbandwidth.n_lm_atm <-
+  gwr.sel(
+    nairobi_const_join3$ATM ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_restaurant <-
+  gwr.sel(
+    nairobi_const_join3$Restaurant ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_fastfood <-
+  gwr.sel(
+    nairobi_const_join3$`Fast Food` ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_toilets <-
+  gwr.sel(
+    nairobi_const_join3$Toilets ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_drinkingwater <-
+  gwr.sel(
+    nairobi_const_join3$`Drinking Water` ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_placeofworship <-
+  gwr.sel(
+    nairobi_const_join3$`Place of Worship` ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+
+gwrbandwidth.n_lm_busstop <-
+  gwr.sel(
+    nairobi_const_join3$Bus_Stop ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+
+gwrbandwidth.n_lm_streetlmap <-
+  gwr.sel(
+    nairobi_const_join3$`Street Lamp`~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+
+gwrbandwidth.n_lm_hotel <-
+  gwr.sel(
+    nairobi_const_join3$Hotel ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+
+gwrbandwidth.n_lm_industrial <-
+  gwr.sel(
+    nairobi_const_join3$Industrial ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_apartments <-
+  gwr.sel(
+    nairobi_const_join3$Apartments ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_house <-
+  gwr.sel(
+    nairobi_const_join3$House ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_church <-
+  gwr.sel(
+    nairobi_const_join3$Church ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+gwrbandwidth.n_lm_mosque <-
+  gwr.sel(
+    nairobi_const_join3$Mosque ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = T
+  )
+
+
+
+
+
+
+gwrmodel.n_lm_osmuid <-
+  gwr(
+    nairobi_const_join3$`Distinct osm_users` ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_point, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_totaledis <-
+  gwr(
+    nairobi_const_join3$`total edits` ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_point, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+
+gwrmodel.n_lm_point <-
+  gwr(
+    nairobi_const_join3$Point_Count ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_point, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_line <-
+  gwr(
+    nairobi_const_join3$Line_Count ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_line, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_polygon <-
+  gwr(
+    nairobi_const_join3$Polygon_Count ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_polygon, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_ft_density <-
+  gwr(
+    nairobi_const_join3$ft_density ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_ft_density, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_school <-
+  gwr(
+    nairobi_const_join3$School ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_school, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_college <-
+  gwr(
+    nairobi_const_join3$College ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_college, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_pub <-
+  gwr(
+    nairobi_const_join3$Pub ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_pub, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+
+gwrmodel.n_lm_bar <-
+  gwr(
+    nairobi_const_join3$Bar ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_bar, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_pharmacy <-
+  gwr(
+    nairobi_const_join3$Pharmacy ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_pharmacy, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_hospital <-
+  gwr(
+    nairobi_const_join3$Hospital ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_hospital, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_dentist <-
+  gwr(
+    nairobi_const_join3$Dentist ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_dentist, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_clinic <-
+  gwr(
+    nairobi_const_join3$Clinic ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate ++
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_clinic, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+
+gwrmodel.n_lm_police <-
+  gwr(
+    nairobi_const_join3$Police ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_police, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_bank <-
+  gwr(
+    nairobi_const_join3$Bank ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_bank, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+
+gwrmodel.n_lm_atm <-
+  gwr(
+    nairobi_const_join3$ATM ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_atm, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_restaurant <-
+  gwr(
+    nairobi_const_join3$Restaurant ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_restaurant, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_fastfood <-
+  gwr(
+    nairobi_const_join3$`Fast Food` ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_fastfood, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_toilets <-
+  gwr(
+    nairobi_const_join3$Toilets ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_toilets, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_drinkingwater <-
+  gwr(
+    nairobi_const_join3$`Drinking Water` ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_drinkingwater, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_placeofworship <-
+  gwr(
+    nairobi_const_join3$`Place of Worship` ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_placeofworship, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+
+gwrmodel.n_lm_busstop <-
+  gwr(
+    nairobi_const_join3$Bus_Stop ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_busstop, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+
+gwrmodel.n_lm_streetlmap <-
+  gwr(
+    nairobi_const_join3$`Street Lamp`~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_streetlmap, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+
+gwrmodel.n_lm_hotel <-
+  gwr(
+    nairobi_const_join3$Hotel ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_hotel, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+
+gwrmodel.n_lm_industrial <-
+  gwr(
+    nairobi_const_join3$Industrial ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_industrial, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_apartments <-
+  gwr(
+    nairobi_const_join3$Apartments ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_apartments, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_house <-
+  gwr(
+    nairobi_const_join3$House ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_house, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_church <-
+  gwr(
+    nairobi_const_join3$Church ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_church, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+gwrmodel.n_lm_mosque <-
+  gwr(
+    nairobi_const_join3$Mosque ~ nairobi_const_join3$population +
+      nairobi_const_join3$`general sex ratio (females to males)` +
+      nairobi_const_join3$`% of primary school attendance (6-13)` +
+      nairobi_const_join3$`Secondary School Attendance of 14- to 17-Year-Olds` +
+      nairobi_const_join3$`education level index` +
+      nairobi_const_join3$`% households owning own livestock` +
+      nairobi_const_join3$`% pop 18-64` +
+      nairobi_const_join3$`% households with 1-3 people` +
+      nairobi_const_join3$`% of female headed households` +
+      nairobi_const_join3$`% of households owning house they live in` +
+      nairobi_const_join3$employment_rate +
+      nairobi_const_join3$`% access to safe water source` + 
+      nairobi_const_join3$`% access to improved sanitation` + 
+      nairobi_const_join3$pop_density, data =n_const_jointrial, adapt = gwrbandwidth.n_lm_mosque, hatmatrix=TRUE, se.fit=TRUE
+  )
+
+
+
+
+
+
+results.gwrmodel.n_lm_osmuid <-
+  as.data.frame(gwrmodel.n_lm_osmuid$SDF)
+
+results.gwrmodel.n_lm_totaledits <-
+  as.data.frame(gwrmodel.n_lm_totaledis$SDF)
+
+results.gwrmodel.n_lm_point <-as.data.frame(gwrmodel.n_lm_point$SDF)
+
+results.gwrmodel.n_lm_line <- as.data.frame(gwrmodel.n_lm_line$SDF)
+
+results.gwrmodel.n_lm_polygon <-
+  as.data.frame(gwrmodel.n_lm_polygon$SDF)
+
+results.gwrmodel.n_lm_ftdensity <-
+  as.data.frame(gwrmodel.n_lm_ft_density$SDF)
+
+results.gwrmodel.n_lm_school <-
+  as.data.frame(gwrmodel.n_lm_school$SDF)
+
+results.gwrmodel.n_lm_college <-
+  as.data.frame(gwrmodel.n_lm_college$SDF)
+
+results.gwrmodel.n_lm_pub <- as.data.frame(gwrmodel.n_lm_pub$SDF)
+
+results.gwrmodel.n_lm_bar <- as.data.frame(gwrmodel.n_lm_bar$SDF)
+
+results.gwrmodel.n_lm_pharmacy <-
+  as.data.frame(gwrmodel.n_lm_pharmacy$SDF)
+
+results.gwrmodel.n_lm_hospital <-
+  as.data.frame(gwrmodel.n_lm_hospital$SDF)
+
+results.gwrmodel.n_lm_dentist <-
+  as.data.frame(gwrmodel.n_lm_dentist$SDF)
+
+results.gwrmodel.n_lm_clinic <-
+  as.data.frame(gwrmodel.n_lm_clinic$SDF)
+
+results.gwrmodel.n_lm_police <-
+  as.data.frame(gwrmodel.n_lm_police$SDF)
+
+results.gwrmodel.n_lm_bank <- as.data.frame(gwrmodel.n_lm_bank$SDF)
+
+results.gwrmodel.n_lm_atm <- as.data.frame(gwrmodel.n_lm_atm$SDF)
+
+results.gwrmodel.n_lm_restaurant <-
+  as.data.frame(gwrmodel.n_lm_restaurant$SDF)
+
+results.gwrmodel.n_lm_fastfood <-
+  as.data.frame(gwrmodel.n_lm_fastfood$SDF)
+
+results.gwrmodel.n_lm_placeofworship <-
+  as.data.frame(gwrmodel.n_lm_placeofworship$SDF)
+
+results.gwrmodel.n_lm_busstop <-
+  as.data.frame(gwrmodel.n_lm_busstop$SDF)
+
+results.gwrmodel.n_lm_streetlamp <-
+  as.data.frame(gwrmodel.n_lm_streetlmap$SDF)
+
+results.gwrmodel.n_lm_hotel <-
+  as.data.frame(gwrmodel.n_lm_hotel$SDF)
+
+results.gwrmodel.n_lm_industrial <-
+  as.data.frame(gwrmodel.n_lm_industrial$SDF)
+
+results.gwrmodel.n_lm_apartments <-
+  as.data.frame(gwrmodel.n_lm_apartments$SDF)
+
+results.gwrmodel.n_lm_house <-
+  as.data.frame(gwrmodel.n_lm_house$SDF)
+
+results.gwrmodel.n_lm_church <-
+  as.data.frame(gwrmodel.n_lm_church$SDF)
+
+results.gwrmodel.n_lm_mosque <-
+  as.data.frame(gwrmodel.n_lm_mosque$SDF)
+
+
+
+
+
+gwr.map.n_lm_osmuid <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_osmuid))
+
+gwr.map.n_lm_totaledits <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_totaledits))
+
+gwr.map.n_lm_point <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_point))
+
+gwr.map.n_lm_line <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_line))
+
+gwr.map.n_lm_polygon <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_polygon))
+
+gwr.map.n_lm_ftdensity <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_ftdensity))
+
+gwr.map.n_lm_school <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_school))
+
+gwr.map.n_lm_college <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_college))
+
+gwr.map.n_lm_pub <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_pub))
+
+gwr.map.n_lm_bar <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_bar))
+
+gwr.map.n_lm_pharmacy <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_pharmacy))
+
+gwr.map.n_lm_hospital <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_hospital))
+
+gwr.map.n_lm_dentist <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_dentist))
+
+gwr.map.n_lm_clinic <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_clinic))
+
+gwr.map.n_lm_police <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_police))
+
+gwr.map.n_lm_bank <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_bank))
+
+gwr.map.n_lm_atm <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_atm))
+
+gwr.map.n_lm_restaurant <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_restaurant))
+
+gwr.map.n_lm_fastfood <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_fastfood))
+
+gwr.map.n_lm_placeofworship <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_placeofworship))
+
+gwr.map.n_lm_busstop <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_busstop))
+
+gwr.map.n_lm_streetlmap <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_streetlamp))
+
+
+gwr.map.n_lm_hotel <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_hotel))
+gwr.map.n_lm_industrial <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_industrial))
+
+gwr.map.n_lm_apartments <-
+  cbind(n_const_jointrial2,
+        as.matrix(results.gwrmodel.n_lm_apartments))
+
+gwr.map.n_lm_house <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_house))
+
+gwr.map.n_lm_church <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_church))
+
+gwr.map.n_lm_mosque <-
+  cbind(n_const_jointrial2, as.matrix(results.gwrmodel.n_lm_mosque))
+
+
+
+#preliminary map
+#look into making fantastic maps
+#perhaps a function to create it for each one, keeping it consistent etc
+#ggplot is better but look into alternatives
+qtm(gwr.map.n_lm_apartments, fill = "localR2")
+
+#also look into sptial autocorrelation of gwr coefficients
+
+BFC02.gwr.test(gwr.model)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#####################################################
+#playing around with maps
+#https://timogrossenbacher.ch/2016/12/beautiful-thematic-maps-with-ggplot2-only/
+
+theme_map <- function(...) {
+  theme_minimal() +
+    theme(
+      text = element_text(family = "Ubuntu Regular", color = "#22211d"),
+      axis.line = element_blank(),
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      # panel.grid.minor = element_line(color = "#ebebe5", size = 0.2),
+      panel.grid.major = element_line(color = "#ebebe5", size = 0.2),
+      panel.grid.minor = element_blank(),
+      plot.background = element_rect(fill = "#f5f5f2", color = NA), 
+      panel.background = element_rect(fill = "#f5f5f2", color = NA), 
+      legend.background = element_rect(fill = "#f5f5f2", color = NA),
+      panel.border = element_blank(),
+      ...
+    )
+}
+n_const_jointrial2@polygons
+
+
+p <- ggplot() +
+  # municipality polygons
+  geom_polygon(data = n_const_jointrial2, aes(fill = n_const_jointrial2$Point_Count, 
+                                    x = long, 
+                                    y = lat, 
+                                    group = group)) +
+  # municipality outline
+  geom_path(data = n_const_jointrial2, aes(x = long, 
+                                 y = lat, 
+                                 group = group), 
+            color = "white", size = 0.1) +
+  coord_equal() +
+  # add the previously defined basic theme
+  theme_map() +
+  labs(x = NULL, 
+       y = NULL, 
+       title = "Switzerland's regional demographics", 
+       subtitle = "Average age in Swiss municipalities, 2015", 
+       caption = "Geometries: ThemaKart, BFS; Data: BFS, 2016")
+
+library(reshape2)
+n_const_jointrial2_melt <- melt(n_const_jointrial2)
+
+
+
+n_const_jointrial2_melt
+z <- ggplot() +
+  geom_polygon(data =  n_const_jointrial2, aes(fill =n_const_jointrial2$Point_Count)) +
+  theme_void() +
+  coord_map()
+
+
+
+
+map <- ggplot() + geom_polygon(data = n_const_jointrial2, aes(x = long, y = lat, group = group), colour = "black", fill = NA)
+map + theme_void()
+
+
+
+
+map <- ggplot() +
+  geom_polygon(data = n_const_jointrial2, aes(fill = n_const_jointrial2$Point_Count, x = long, y = lat, group = group)) +
+  theme_void() +
+  coord_map()
+
+map
+
+
+
+install.packages("tidyverse")

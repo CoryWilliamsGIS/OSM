@@ -28,7 +28,7 @@ gm_sum <-
 Manchester_ward_tags <-
   read_excel("casestudy_ward_tags.xlsx", sheet = "New_Greater_Manchester")
 Manchester_ward_tags1 <- Manchester_ward_tags[, c(50, 1:49)]
-
+Added_tags <- Manchester_ward_tags[, 51:58]
 #distinct users per ward
 #read in excel file which you have exported each in
 m_uid <- read_excel("m_uid_poi1.xlsx", sheet = "overalll")
@@ -57,9 +57,10 @@ Manchester_ward_tags1[35, 2] <-  "Brooklands Trafford"
 Manchester_ward_tags1[179, 2] <-  "St Mary's Bury"
 Manchester_ward_tags1[180, 2] <-  "St Mary's Oldham"
 Manchester_ward_tags1[181, 2] <-  "St Mary's Trafford"
-Manchester_ward_tags1 <- Manchester_ward_tags1[, c(1:50, 1)]
+#Manchester_ward_tags1 <- Manchester_ward_tags1[, c(1:50, 1)]
 Manchester_ward_tags <- Manchester_ward_tags1
 Manchester_ward_tags <- Manchester_ward_tags[, -1]
+
 
 GM_PCA[5, 2] <-  "Crompton Bolton"
 GM_PCA[75, 2] <-  "Crompton Oldham"
@@ -100,6 +101,10 @@ m_tag_house <- Manchester_ward_tags[, 44:45]
 m_tag_church <- Manchester_ward_tags[, 46:47]
 m_tag_mosque <- Manchester_ward_tags[, 48:49]
 m_tag_unique_users <- gm_sum[, 1:6]
+m_Tag_footway <- Added_tags[, 1:2]
+m_Tag_primary <- Added_tags[, 3:4]
+m_Tag_residential <- Added_tags[, 5:6]
+m_Tag_unclassified  <- Added_tags[, 7:8]
 
 m_tag_drinking_water[is.na(m_tag_drinking_water)] <- 0
 
@@ -121,27 +126,29 @@ m_tag1 <- left_join(m_tag1, m_tag_clinic, by = c("ward" = "ward8"))
 m_tag1 <- left_join(m_tag1, m_tag_police, by = c("ward" = "ward9"))
 m_tag1 <- left_join(m_tag1, m_tag_bank, by = c("ward" = "ward10"))
 m_tag1 <- left_join(m_tag1, m_tag_atm, by = c("ward" = "ward11"))
-m_tag1 <-
-  left_join(m_tag1, m_tag_restaurant, by = c("ward" = "ward12"))
-m_tag1 <-
-  left_join(m_tag1, m_tag_fast_food, by = c("ward" = "ward13"))
+m_tag1 <- left_join(m_tag1, m_tag_restaurant, by = c("ward" = "ward12"))
+m_tag1 <- left_join(m_tag1, m_tag_fast_food, by = c("ward" = "ward13"))
 m_tag1 <- left_join(m_tag1, m_tag_toilets, by = c("ward" = "ward14"))
 #m_tag1 <- left_join(m_tag1, m_tag_drinking_water, by=c("ward"="ward15"))
-m_tag1 <-
-  left_join(m_tag1, m_tag_place_of_worship, by = c("ward" = "ward16"))
+m_tag1 <- left_join(m_tag1, m_tag_place_of_worship, by = c("ward" = "ward16"))
 m_tag1 <- left_join(m_tag1, m_tag_bus_stop, by = c("ward" = "ward17"))
-m_tag1 <-
-  left_join(m_tag1, m_tag_street_lamp, by = c("ward" = "ward18"))
+m_tag1 <- left_join(m_tag1, m_tag_street_lamp, by = c("ward" = "ward18"))
 m_tag1 <- left_join(m_tag1, m_tag_hotel, by = c("ward" = "ward19"))
-m_tag1 <-
-  left_join(m_tag1, m_tag_industrial, by = c("ward" = "ward20"))
-m_tag1 <-
-  left_join(m_tag1, m_tag_apartment, by = c("ward" = "ward21"))
+m_tag1 <- left_join(m_tag1, m_tag_industrial, by = c("ward" = "ward20"))
+m_tag1 <- left_join(m_tag1, m_tag_apartment, by = c("ward" = "ward21"))
 m_tag1 <- left_join(m_tag1, m_tag_house, by = c("ward" = "ward22"))
 m_tag1 <- left_join(m_tag1, m_tag_church, by = c("ward" = "ward23"))
 m_tag1 <- left_join(m_tag1, m_tag_mosque, by = c("ward" = "ward24"))
+m_tag1 <- left_join(m_tag1, m_Tag_footway, by = c("ward" = "ward25"))
+m_tag1 <- left_join(m_tag1, m_Tag_primary, by = c("ward" = "ward26"))
+m_tag1 <- left_join(m_tag1, m_Tag_residential, by = c("ward" = "ward27"))
+m_tag1 <- left_join(m_tag1, m_Tag_unclassified, by = c("ward" = "ward28"))
 
-
+# m_tag_unique_users <- gm_sum[, 1:6]
+# m_Tag_footway <- Added_tags[, 1:2]
+# m_Tag_primary <- Added_tags[, 3:4]
+# m_Tag_footway <- Added_tags[, 5:6]
+# m_Tag_footway <- Added_tags[, 7:8]
 #backup the original
 m_tag2 <- m_tag1
 
@@ -182,7 +189,7 @@ join <- left_join(indepdf, depdf, by = c("Ward name" = "ward"))
 #join <- join[-51:-78]
 
 colnames(join)
-names(join) <- gsub(".x", "", names(join), fixed = TRUE)
+#names(join) <- gsub(".x", "", names(join), fixed = TRUE)
 
 #write.csv(join, file = "Manchester_wards_join.csv")
 
@@ -442,6 +449,26 @@ lm_mosque <-
   lm(
     join$Mosque ~ join$population + join$pp_hh + join$`general sex ratio (females to males)` + join$`% of households owning house they live in` + join$total_hh + join$`% population U18` + join$`% pop 18-64` + join$`% pop over 64` + join$`% households with 1-3 people` + join$`% households with 4-6 people` + join$`% households with 7+ people`
   )
+lm_footway <-
+  lm(
+    join$Footway ~ join$population + join$pp_hh + join$`general sex ratio (females to males)` + join$`% of households owning house they live in` + join$total_hh + join$`% population U18` + join$`% pop 18-64` + join$`% pop over 64` + join$`% households with 1-3 people` + join$`% households with 4-6 people` + join$`% households with 7+ people`
+  )
+lm_primary <-
+  lm(
+    join$Primary ~ join$population + join$pp_hh + join$`general sex ratio (females to males)` + join$`% of households owning house they live in` + join$total_hh + join$`% population U18` + join$`% pop 18-64` + join$`% pop over 64` + join$`% households with 1-3 people` + join$`% households with 4-6 people` + join$`% households with 7+ people`
+  )
+lm_residential <-
+  lm(
+    join$Residential ~ join$population + join$pp_hh + join$`general sex ratio (females to males)` + join$`% of households owning house they live in` + join$total_hh + join$`% population U18` + join$`% pop 18-64` + join$`% pop over 64` + join$`% households with 1-3 people` + join$`% households with 4-6 people` + join$`% households with 7+ people`
+  )
+lm_unclassified <-
+  lm(
+    join$Unclassified ~ join$population + join$pp_hh + join$`general sex ratio (females to males)` + join$`% of households owning house they live in` + join$total_hh + join$`% population U18` + join$`% pop 18-64` + join$`% pop over 64` + join$`% households with 1-3 people` + join$`% households with 4-6 people` + join$`% households with 7+ people`
+  )
+
+
+
+
 
 summary(lm_school)
 summary(lm_college)
@@ -465,6 +492,10 @@ summary(lm_apartments)
 summary(lm_house)
 summary(lm_church)
 summary(lm_mosque)
+summary(lm_footway)
+summary(lm_primary)
+summary(lm_residential)
+summary(lm_unclassified)
 
 
 #clean up
@@ -498,7 +529,11 @@ rm(
   lm_school,
   lm_streetlamp,
   lm_toilets,
-  lm_totaledits
+  lm_totaledits,
+  lm_footway,
+  lm_residential,
+  lm_primary,
+  lm_unclassified
 )
 
 rm(

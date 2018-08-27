@@ -1,3 +1,8 @@
+
+##### THIS IS THE MOST UP TO DATE FILE!!!!! 
+
+
+
 #install.packages("caret")
 library(caret)
 #install.packages("pls")
@@ -21,7 +26,7 @@ gm_sum <- read_excel("Manchester_ward_data_summary.xlsx", sheet = "Manchester_wa
 
 Manchester_ward_tags <- read_excel("casestudy_ward_tags.xlsx", sheet = "New_Greater_Manchester")
 
-Manchester_ward_tags1 <- Manchester_ward_tags[, c(50, 1:49)]
+Manchester_ward_tags1 <- Manchester_ward_tags[, c(50, 1:49, 51:58)]
 Manchester_ward_tags1 <- Manchester_ward_tags1[,-1]
 
 #distinct users per ward
@@ -46,9 +51,9 @@ Manchester_ward_tags1[35, 2] <-  "Brooklands Trafford"
 Manchester_ward_tags1[179, 2] <-  "St Mary's Bury"
 Manchester_ward_tags1[180, 2] <-  "St Mary's Oldham"
 Manchester_ward_tags1[181, 2] <-  "St Mary's Trafford"
-Manchester_ward_tags1 <- Manchester_ward_tags1[, c(1:49, 1)]
+Manchester_ward_tags1 <- Manchester_ward_tags1[, c(1:57, 1)]
 Manchester_ward_tags <- Manchester_ward_tags1
-Manchester_ward_tags <- Manchester_ward_tags[, -1]
+#Manchester_ward_tags <- Manchester_ward_tags[, -1]
 
 GM_PCA[5, 2] <-  "Crompton Bolton"
 GM_PCA[75, 2] <-  "Crompton Oldham"
@@ -89,6 +94,11 @@ m_tag_house <- Manchester_ward_tags1[, 44:45]
 m_tag_church <- Manchester_ward_tags1[, 46:47]
 m_tag_mosque <- Manchester_ward_tags1[, 48:49]
 m_tag_drinking_water[is.na(m_tag_drinking_water)] <- 0
+m_Tag_footway <- Manchester_ward_tags1[, 50:51]
+m_Tag_primary <- Manchester_ward_tags1[, 52:53]
+m_Tag_residential <- Manchester_ward_tags1[, 54:55]
+m_Tag_unclassified <- Manchester_ward_tags1[, 56:57]
+
 
 #m_tag1 <- m_tag_begin
 m_tag1 <- m_tag_unique_users
@@ -120,7 +130,10 @@ m_tag1 <-left_join(m_tag1, m_tag_apartment, by = c("ward" = "ward21"))
 m_tag1 <- left_join(m_tag1, m_tag_house, by = c("ward" = "ward22"))
 m_tag1 <- left_join(m_tag1, m_tag_church, by = c("ward" = "ward23"))
 m_tag1 <- left_join(m_tag1, m_tag_mosque, by = c("ward" = "ward24"))
-
+m_tag1 <- left_join(m_tag1, m_Tag_footway, by = c("ward" = "ward25"))
+m_tag1 <- left_join(m_tag1, m_Tag_primary, by = c("ward" = "ward26"))
+m_tag1 <- left_join(m_tag1, m_Tag_residential, by = c("ward" = "ward27"))
+m_tag1 <- left_join(m_tag1, m_Tag_unclassified, by = c("ward" = "ward28"))
 m_tag2 <- m_tag1
 
 
@@ -286,21 +299,22 @@ lm_school <- lm(
     manchester_join3$female_lone_parent
 )
 
-lm_college <- lm(
-  manchester_join3$College ~ manchester_join3$population +
-    manchester_join3$`general sex ratio (females to males)` +
-    
-    manchester_join3$`% pop 18-64` +
-    
-    manchester_join3$`% households with 1-3 people` +
-    manchester_join3$`% Employment Rate` +
-    manchester_join3$`% of households owning house they live in` +
-    manchester_join3$car_or_van +
-    manchester_join3$highest_qual_level4_plus +
-    manchester_join3$christian_count +
-    manchester_join3$muslim_count +
-    manchester_join3$female_lone_parent
-)
+#no colleges present... 
+# lm_college <- lm(
+#   manchester_join3$College ~ manchester_join3$population +
+#     manchester_join3$`general sex ratio (females to males)` +
+#     
+#     manchester_join3$`% pop 18-64` +
+#     
+#     manchester_join3$`% households with 1-3 people` +
+#     manchester_join3$`% Employment Rate` +
+#     manchester_join3$`% of households owning house they live in` +
+#     manchester_join3$car_or_van +
+#     manchester_join3$highest_qual_level4_plus +
+#     manchester_join3$christian_count +
+#     manchester_join3$muslim_count +
+#     manchester_join3$female_lone_parent
+# )
 
 lm_pub <- lm(
   manchester_join3$Pub ~ manchester_join3$population +
@@ -638,6 +652,61 @@ lm_mosque <- lm(
     manchester_join3$female_lone_parent
 )
 
+lm_footway <- lm(
+  manchester_join3$Footway ~ manchester_join3$population +
+    manchester_join3$`general sex ratio (females to males)` +
+    manchester_join3$`% pop 18-64` +
+    manchester_join3$`% households with 1-3 people` +
+    manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent
+)
+
+lm_primary <- lm(
+  manchester_join3$Primary ~ manchester_join3$population +
+    manchester_join3$`general sex ratio (females to males)` +
+    manchester_join3$`% pop 18-64` +
+    manchester_join3$`% households with 1-3 people` +
+    manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent
+)
+
+lm_residential <- lm(
+  manchester_join3$Residential ~ manchester_join3$population +
+    manchester_join3$`general sex ratio (females to males)` +
+    manchester_join3$`% pop 18-64` +
+    manchester_join3$`% households with 1-3 people` +
+    manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent
+)
+
+lm_unclassified <- lm(
+  manchester_join3$Unclassified ~ manchester_join3$population +
+    manchester_join3$`general sex ratio (females to males)` +
+    manchester_join3$`% pop 18-64` +
+    manchester_join3$`% households with 1-3 people` +
+    manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent
+)
 
 
 summary(lm_osmuid)
@@ -670,7 +739,10 @@ summary(lm_apartments)
 summary(lm_house)
 summary(lm_church)
 summary(lm_mosque)
-
+summary(lm_footway)
+summary(lm_primary)
+summary(lm_residential)
+summary(lm_unclassified)
 
 
 #SPATIAL AUTOCORRELATION
@@ -703,34 +775,34 @@ listw <- nb2listw(neighbours)
 listw
 
 #moran I - residuals
-moran.test(lm_totaledits$residuals, listw)
-moran.test(lm_point$residuals, listw)
-moran.test(lm_line$residuals, listw)
-moran.test(lm_polygon$residuals, listw)
-moran.test(lm_ftdensity$residuals, listw)
-moran.test(lm_school$residuals, listw)
-moran.test(lm_college$residuals, listw)
-moran.test(lm_pub$residuals, listw)
-moran.test(lm_bar$residuals, listw)
-moran.test(lm_pharmacy$residuals, listw)
-moran.test(lm_hospital$residuals, listw)
-moran.test(lm_dentist$residuals, listw)
-moran.test(lm_clinic$residuals, listw)
-moran.test(lm_police$residuals, listw)
-moran.test(lm_bank$residuals, listw)
-moran.test(lm_atm$residuals, listw)
-moran.test(lm_restaurant$residuals, listw)
-moran.test(lm_fastfood$residuals, listw)
-moran.test(lm_toilets$residuals, listw)
-moran.test(lm_placeofworship$residuals, listw)
-moran.test(lm_busstop$residuals, listw)
-moran.test(lm_streetlmap$residuals, listw)
-moran.test(lm_hotel$residuals, listw)
-moran.test(lm_industrial$residuals, listw)
-#moran.test(lm_apartments$residuals, listw) #WILL BE ADDED IN LATER
-moran.test(lm_house$residuals, listw)
-moran.test(lm_church$residuals, listw)
-moran.test(lm_mosque$residuals, listw)
+# moran.test(lm_totaledits$residuals, listw)
+# moran.test(lm_point$residuals, listw)
+# moran.test(lm_line$residuals, listw)
+# moran.test(lm_polygon$residuals, listw)
+# moran.test(lm_ftdensity$residuals, listw)
+# moran.test(lm_school$residuals, listw)
+# moran.test(lm_college$residuals, listw)
+# moran.test(lm_pub$residuals, listw)
+# moran.test(lm_bar$residuals, listw)
+# moran.test(lm_pharmacy$residuals, listw)
+# moran.test(lm_hospital$residuals, listw)
+# moran.test(lm_dentist$residuals, listw)
+# moran.test(lm_clinic$residuals, listw)
+# moran.test(lm_police$residuals, listw)
+# moran.test(lm_bank$residuals, listw)
+# moran.test(lm_atm$residuals, listw)
+# moran.test(lm_restaurant$residuals, listw)
+# moran.test(lm_fastfood$residuals, listw)
+# moran.test(lm_toilets$residuals, listw)
+# moran.test(lm_placeofworship$residuals, listw)
+# moran.test(lm_busstop$residuals, listw)
+# moran.test(lm_streetlmap$residuals, listw)
+# moran.test(lm_hotel$residuals, listw)
+# moran.test(lm_industrial$residuals, listw)
+# #moran.test(lm_apartments$residuals, listw) #WILL BE ADDED IN LATER
+# moran.test(lm_house$residuals, listw)
+# moran.test(lm_church$residuals, listw)
+# moran.test(lm_mosque$residuals, listw)
 
 #MORAN I - INDEPENDENT 
 moran.test(manchester_join3$population, listw)
@@ -747,38 +819,40 @@ moran.test(manchester_join3$christian_count, listw)
 moran.test(manchester_join3$muslim_count, listw) 
 moran.test(manchester_join3$female_lone_parent, listw)
 
+global_moran_map <- cbind(jointrial, local)
+
 #MORAN I - DEPENDENT
 
 #dependent variables
-moran.test(manchester_join3$users, listw)
-moran.test(manchester_join3$`total edits`, listw)
-moran.test(manchester_join3$Point_Count, listw)
-moran.test(manchester_join3$Line_Count, listw)
-moran.test(manchester_join3$Polygon_Count, listw)
-moran.test(manchester_join3$ft_density, listw)
-moran.test(manchester_join3$School, listw)
-moran.test(manchester_join3$College, listw)
-moran.test(manchester_join3$Pub, listw)
-moran.test(manchester_join3$Bar, listw)
-moran.test(manchester_join3$Pharmacy, listw)
-moran.test(manchester_join3$Hospital, listw)
-moran.test(manchester_join3$Dentist, listw)
-moran.test(manchester_join3$Clinic, listw)
-moran.test(manchester_join3$Police, listw)
-moran.test(manchester_join3$Bank, listw)
-moran.test(manchester_join3$ATM, listw)
-moran.test(manchester_join3$Restaurant, listw)
-moran.test(manchester_join3$`Fast Food`, listw)
-moran.test(manchester_join3$Toilets, listw)
-moran.test(manchester_join3$`Place of Worship`, listw)
-moran.test(manchester_join3$Bus_Stop, listw)
-moran.test(manchester_join3$`Street Lamp`, listw)
-moran.test(manchester_join3$Hotel, listw)
-moran.test(manchester_join3$Industrial, listw)
-#moran.test(manchester_join3$Apartments) #WILL BE ADDED LATER
-moran.test(manchester_join3$House, listw)
-moran.test(manchester_join3$Church, listw)
-moran.test(manchester_join3$Mosque, listw)
+# moran.test(manchester_join3$users, listw)
+# moran.test(manchester_join3$`total edits`, listw)
+# moran.test(manchester_join3$Point_Count, listw)
+# moran.test(manchester_join3$Line_Count, listw)
+# moran.test(manchester_join3$Polygon_Count, listw)
+# moran.test(manchester_join3$ft_density, listw)
+# moran.test(manchester_join3$School, listw)
+# moran.test(manchester_join3$College, listw)
+# moran.test(manchester_join3$Pub, listw)
+# moran.test(manchester_join3$Bar, listw)
+# moran.test(manchester_join3$Pharmacy, listw)
+# moran.test(manchester_join3$Hospital, listw)
+# moran.test(manchester_join3$Dentist, listw)
+# moran.test(manchester_join3$Clinic, listw)
+# moran.test(manchester_join3$Police, listw)
+# moran.test(manchester_join3$Bank, listw)
+# moran.test(manchester_join3$ATM, listw)
+# moran.test(manchester_join3$Restaurant, listw)
+# moran.test(manchester_join3$`Fast Food`, listw)
+# moran.test(manchester_join3$Toilets, listw)
+# moran.test(manchester_join3$`Place of Worship`, listw)
+# moran.test(manchester_join3$Bus_Stop, listw)
+# moran.test(manchester_join3$`Street Lamp`, listw)
+# moran.test(manchester_join3$Hotel, listw)
+# moran.test(manchester_join3$Industrial, listw)
+# #moran.test(manchester_join3$Apartments) #WILL BE ADDED LATER
+# moran.test(manchester_join3$House, listw)
+# moran.test(manchester_join3$Church, listw)
+# moran.test(manchester_join3$Mosque, listw)
 
 
 
@@ -929,19 +1003,19 @@ gwrbandwidth_lmschool <- gwr.sel(
     manchester_join3$female_lone_parent, data =m_jointrial, adapt = T
 )
 
-gwrbandwidth_lmcollege <- gwr.sel(
-  manchester_join3$College ~ manchester_join3$population +
-    manchester_join3$`general sex ratio (females to males)` +
-    manchester_join3$`% pop 18-64` +
-    manchester_join3$`% households with 1-3 people` +
-    manchester_join3$`% Employment Rate` +
-    manchester_join3$`% of households owning house they live in` +
-    manchester_join3$car_or_van +
-    manchester_join3$highest_qual_level4_plus +
-    manchester_join3$christian_count +
-    manchester_join3$muslim_count +
-    manchester_join3$female_lone_parent, data =m_jointrial, adapt = T
-)
+# gwrbandwidth_lmcollege <- gwr.sel(
+#   manchester_join3$ ~ manchester_join3$population +
+#     manchester_join3$`general sex ratio (females to males)` +
+#     manchester_join3$`% pop 18-64` +
+#     manchester_join3$`% households with 1-3 people` +
+#     manchester_join3$`% Employment Rate` +
+#     manchester_join3$`% of households owning house they live in` +
+#     manchester_join3$car_or_van +
+#     manchester_join3$highest_qual_level4_plus +
+#     manchester_join3$christian_count +
+#     manchester_join3$muslim_count +
+#     manchester_join3$female_lone_parent, data =m_jointrial, adapt = T
+# )
 
 gwrbandwidth_lmpub <- gwr.sel(
   manchester_join3$Pub ~ manchester_join3$population +
@@ -1182,20 +1256,20 @@ gwrbandwidth_lmindustrial <- gwr.sel(
     manchester_join3$female_lone_parent, data =m_jointrial, adapt = T
 )
 
-##APARTMENT COUNT MISSING
-# gwrbandwidth_lmapartments <- gwr.sel(
-#   manchester_join3$Apartments ~ manchester_join3$population +
-#     manchester_join3$`general sex ratio (females to males)` +
-#     manchester_join3$`% pop 18-64` +
-#     manchester_join3$`% households with 1-3 people` +
-#     manchester_join3$`% Employment Rate` +
-#     manchester_join3$`% of households owning house they live in` +
-#     manchester_join3$car_or_van +
-#     manchester_join3$highest_qual_level4_plus +
-#     manchester_join3$christian_count +
-#     manchester_join3$muslim_count +
-#     manchester_join3$female_lone_parent, data =m_jointrial, adapt = T
-# )
+
+ gwrbandwidth_lmapartments <- gwr.sel(
+   manchester_join3$Apartments ~ manchester_join3$population +
+     manchester_join3$`general sex ratio (females to males)` +
+     manchester_join3$`% pop 18-64` +
+     manchester_join3$`% households with 1-3 people` +
+     manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent, data =m_jointrial, adapt = T
+)
 
 gwrbandwidth_lmhouse <- gwr.sel(
   manchester_join3$House ~ manchester_join3$population +
@@ -1238,6 +1312,61 @@ gwrbandwidth_lmmosque <- gwr.sel(
     manchester_join3$female_lone_parent, data =m_jointrial, adapt = T
 )
 
+gwrbandwidth_lmfootway <- gwr.sel(
+  manchester_join3$Footway ~ manchester_join3$population +
+    manchester_join3$`general sex ratio (females to males)` +
+    manchester_join3$`% pop 18-64` +
+    manchester_join3$`% households with 1-3 people` +
+    manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent, data =m_jointrial, adapt = T
+)
+
+gwrbandwidth_lmprimary<- gwr.sel(
+  manchester_join3$Primary ~ manchester_join3$population +
+    manchester_join3$`general sex ratio (females to males)` +
+    manchester_join3$`% pop 18-64` +
+    manchester_join3$`% households with 1-3 people` +
+    manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent, data =m_jointrial, adapt = T
+)
+
+gwrbandwidth_lmresidential <- gwr.sel(
+  manchester_join3$Residential ~ manchester_join3$population +
+    manchester_join3$`general sex ratio (females to males)` +
+    manchester_join3$`% pop 18-64` +
+    manchester_join3$`% households with 1-3 people` +
+    manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent, data =m_jointrial, adapt = T
+)
+
+gwrbandwidth_lmunclassified <- gwr.sel(
+  manchester_join3$Unclassified ~ manchester_join3$population +
+    manchester_join3$`general sex ratio (females to males)` +
+    manchester_join3$`% pop 18-64` +
+    manchester_join3$`% households with 1-3 people` +
+    manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent, data =m_jointrial, adapt = T
+)
 
 #GWR - model
 
@@ -1338,20 +1467,20 @@ gwrmodel.lmschool <- gwr(
     manchester_join3$muslim_count +
     manchester_join3$female_lone_parent, data =m_jointrial, adapt = gwrbandwidth_lmschool, hatmatrix=TRUE, se.fit=TRUE
 )
-
-gwrmodel.lmcollege <- gwr(
-  manchester_join3$College ~ manchester_join3$population +
-    manchester_join3$`general sex ratio (females to males)` +
-    manchester_join3$`% pop 18-64` +
-    manchester_join3$`% households with 1-3 people` +
-    manchester_join3$`% Employment Rate` +
-    manchester_join3$`% of households owning house they live in` +
-    manchester_join3$car_or_van +
-    manchester_join3$highest_qual_level4_plus +
-    manchester_join3$christian_count +
-    manchester_join3$muslim_count +
-    manchester_join3$female_lone_parent, data =m_jointrial, adapt = gwrbandwidth_lmcollege, hatmatrix=TRUE, se.fit=TRUE
-)
+# 
+# gwrmodel.lmcollege <- gwr(
+#   manchester_join3$College ~ manchester_join3$population +
+#     manchester_join3$`general sex ratio (females to males)` +
+#     manchester_join3$`% pop 18-64` +
+#     manchester_join3$`% households with 1-3 people` +
+#     manchester_join3$`% Employment Rate` +
+#     manchester_join3$`% of households owning house they live in` +
+#     manchester_join3$car_or_van +
+#     manchester_join3$highest_qual_level4_plus +
+#     manchester_join3$christian_count +
+#     manchester_join3$muslim_count +
+#     manchester_join3$female_lone_parent, data =m_jointrial, adapt = gwrbandwidth_lmcollege, hatmatrix=TRUE, se.fit=TRUE
+# )
 
 gwrmodel.lmpub <- gwr(
   manchester_join3$Pub ~ manchester_join3$population +
@@ -1592,20 +1721,20 @@ gwrmodel.lmindustrial <- gwr(
     manchester_join3$female_lone_parent, data =m_jointrial, adapt = gwrbandwidth_lmindustrial, hatmatrix=TRUE, se.fit=TRUE
 )
 
-##APARTMENT COUNT MISSING
-#gwrmodel.lmapartments <- gwr(
-# manchester_join3$Apartments ~ manchester_join3$population +
-#  manchester_join3$`general sex ratio (females to males)` +
-# manchester_join3$`% pop 18-64` +
-#manchester_join3$`% households with 1-3 people` +
-#manchester_join3$`% Employment Rate` +
-#manchester_join3$`% of households owning house they live in` +
-#manchester_join3$car_or_van +
-#manchester_join3$highest_qual_level4_plus +
-#manchester_join3$christian_count +
-#manchester_join3$muslim_count +
-#manchester_join3$female_lone_parent, data =m_jointrial, adapt = gwrbandwidth_lm_, hatmatrix=TRUE, se.fit=TRUE
-#)
+
+gwrmodel.lmapartments <- gwr(
+ manchester_join3$Apartments ~ manchester_join3$population +
+  manchester_join3$`general sex ratio (females to males)` +
+ manchester_join3$`% pop 18-64` +
+manchester_join3$`% households with 1-3 people` +
+manchester_join3$`% Employment Rate` +
+manchester_join3$`% of households owning house they live in` +
+manchester_join3$car_or_van +
+manchester_join3$highest_qual_level4_plus +
+manchester_join3$christian_count +
+manchester_join3$muslim_count +
+manchester_join3$female_lone_parent, data =m_jointrial, adapt = gwrbandwidth_lmapartments, hatmatrix=TRUE, se.fit=TRUE
+)
 
 gwrmodel.lmhouse <- gwr(
   manchester_join3$House ~ manchester_join3$population +
@@ -1649,6 +1778,62 @@ gwrmodel.lmmosque <- gwr(
     manchester_join3$female_lone_parent, data =m_jointrial, adapt = gwrbandwidth_lmmosque, hatmatrix=TRUE, se.fit=TRUE
 )
 
+gwrmodel.lmfootway <- gwr(
+  manchester_join3$Mosque ~ manchester_join3$population +
+    manchester_join3$`general sex ratio (females to males)` +
+    manchester_join3$`% pop 18-64` +
+    manchester_join3$`% households with 1-3 people` +
+    manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent, data =m_jointrial, adapt = gwrbandwidth_lmfootway, hatmatrix=TRUE, se.fit=TRUE
+)
+
+gwrmodel.lmprimary <- gwr(
+  manchester_join3$Mosque ~ manchester_join3$population +
+    manchester_join3$`general sex ratio (females to males)` +
+    manchester_join3$`% pop 18-64` +
+    manchester_join3$`% households with 1-3 people` +
+    manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent, data =m_jointrial, adapt = gwrbandwidth_lmprimary, hatmatrix=TRUE, se.fit=TRUE
+)
+
+gwrmodel.lmresidential <- gwr(
+  manchester_join3$Mosque ~ manchester_join3$population +
+    manchester_join3$`general sex ratio (females to males)` +
+    manchester_join3$`% pop 18-64` +
+    manchester_join3$`% households with 1-3 people` +
+    manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent, data =m_jointrial, adapt = gwrbandwidth_lmresidential, hatmatrix=TRUE, se.fit=TRUE
+)
+
+gwrmodel.lmunclassified <- gwr(
+  manchester_join3$Mosque ~ manchester_join3$population +
+    manchester_join3$`general sex ratio (females to males)` +
+    manchester_join3$`% pop 18-64` +
+    manchester_join3$`% households with 1-3 people` +
+    manchester_join3$`% Employment Rate` +
+    manchester_join3$`% of households owning house they live in` +
+    manchester_join3$car_or_van +
+    manchester_join3$highest_qual_level4_plus +
+    manchester_join3$christian_count +
+    manchester_join3$muslim_count +
+    manchester_join3$female_lone_parent, data =m_jointrial, adapt = gwrbandwidth_lmunclassified, hatmatrix=TRUE, se.fit=TRUE
+)
+
 
 #ASSIGN RESULTS
 
@@ -1666,7 +1851,7 @@ results.gwrmodel.lmftdensity <- as.data.frame(gwrmodel.lmftdensity$SDF)
 
 results.gwrmodel.lmschool <- as.data.frame(gwrmodel.lmschool$SDF)
 
-results.gwrmodel.lmcollege <- as.data.frame(gwrmodel.lmcollege$SDF)
+#results.gwrmodel.lmcollege <- as.data.frame(gwrmodel.lmcollege$SDF)
 
 results.gwrmodel.lmpub <- as.data.frame(gwrmodel.lmpub$SDF)
 
@@ -1700,13 +1885,21 @@ results.gwrmodel.lmhotel <- as.data.frame(gwrmodel.lmhotel$SDF)
 
 results.gwrmodel.lmindustrial <- as.data.frame(gwrmodel.lmindustrial$SDF)
 
-#results.gwrmodel.lmapartments <- as.data.frame(gwrmodel.lmapartments$SDF)
+results.gwrmodel.lmapartments <- as.data.frame(gwrmodel.lmapartments$SDF)
 
 results.gwrmodel.lmhouse <- as.data.frame(gwrmodel.lmhouse$SDF)
 
 results.gwrmodel.lmchurch <- as.data.frame(gwrmodel.lmchurch$SDF)
 
 results.gwrmodel.lmmosque <- as.data.frame(gwrmodel.lmmosque$SDF)
+
+results.gwrmodel.lmfootway <- as.data.frame(gwrmodel.lmfootway$SDF)
+
+results.gwrmodel.lmprimary <- as.data.frame(gwrmodel.lmprimary$SDF)
+
+results.gwrmodel.lmresidential <- as.data.frame(gwrmodel.lmresidential$SDF)
+
+results.gwrmodel.lmunclassified <- as.data.frame(gwrmodel.lmunclassified$SDF)
 
 
 #ASSIGN TO MAP
@@ -1738,9 +1931,9 @@ gwr.map.lmftdensity <-
 gwr.map.lmschool <-
   cbind(m_jointrial, as.matrix(results.gwrmodel.lmschool))
 
-gwr.map.lmcollege <-
-  cbind(m_jointrial,
-        as.matrix(results.gwrmodel.lmcollege))
+# gwr.map.lmcollege <-
+#   cbind(m_jointrial,
+#         as.matrix(results.gwrmodel.lmcollege))
 
 gwr.map.lmpub <-
   cbind(m_jointrial, as.matrix(results.gwrmodel.lmpub))
@@ -1798,9 +1991,9 @@ gwr.map.lmindustrial <-
   cbind(m_jointrial,
         as.matrix(results.gwrmodel.lmindustrial))
 
-#gwr.map.lmapartments <-
-#  cbind(m_jointrial,
-#        as.matrix(results.gwrmodel.lmapartments))
+gwr.map.lmapartments <-
+  cbind(m_jointrial,
+        as.matrix(results.gwrmodel.lmapartments))
 
 gwr.map.lmhouse <-
   cbind(m_jointrial, as.matrix(results.gwrmodel.lmhouse))
@@ -1811,7 +2004,17 @@ gwr.map.lmchurch <-
 gwr.map.lmmosque <-
   cbind(m_jointrial, as.matrix(results.gwrmodel.lmmosque))
 
+gwr.map.lmfootway <-
+  cbind(m_jointrial, as.matrix(results.gwrmodel.lmfootway))
 
+gwr.map.lmprimary <-
+  cbind(m_jointrial, as.matrix(results.gwrmodel.lmprimary))
+
+gwr.map.lmresidential <-
+  cbind(m_jointrial, as.matrix(results.gwrmodel.lmresidential))
+
+gwr.map.lmunclassified <-
+  cbind(m_jointrial, as.matrix(results.gwrmodel.lmunclassified))
 
 
 qtm(gwr.map.lmosmuid, fill = "localR2")
@@ -1821,7 +2024,7 @@ qtm(gwr.map.lmline, fill = "localR2")
 qtm(gwr.map.lmpolygon, fill = "localR2")
 qtm(gwr.map.lmftdensity, fill = "localR2") 
 qtm(gwr.map.lmschool, fill = "localR2")
-qtm(gwr.map.lmcollege, fill = "localR2")
+#qtm(gwr.map.lmcollege, fill = "localR2")
 qtm(gwr.map.lmpub, fill = "localR2")
 qtm(gwr.map.lmbar, fill = "localR2") 
 qtm(gwr.map.lmpharmacy, fill = "localR2")
@@ -1836,12 +2039,15 @@ qtm(gwr.map.lmfastfood, fill = "localR2")
 qtm(gwr.map.lmplaceofworship, fill = "localR2")
 qtm(gwr.map.lmbusstop, fill = "localR2")
 qtm(gwr.map.lmstreetlamp, fill = "localR2")
-qtm(gwr.map.lmhotel, fill = "localR2") #big deviation
+qtm(gwr.map.lmhotel, fill = "localR2") #goooood
 qtm(gwr.map.lmapartments, fill = "localR2") 
 qtm(gwr.map.lmhouse, fill = "localR2") 
 qtm(gwr.map.lmchurch, fill = "localR2") 
-qtm(gwr.map.lmmosque, fill = "localR2") #big deviation
-
+qtm(gwr.map.lmmosque, fill = "localR2") #gooood 
+qtm(gwr.map.lmfootway, fill = "localR2") #not sure how can be minus???? #gooooooood?/
+qtm(gwr.map.lmprimary, fill = "localR2")
+qtm(gwr.map.lmresidential, fill = "localR2")
+qtm(gwr.map.lmunclassified, fill = "localR2") #decent
 
 
 writeOGR(m_jointrial, ".", "m_jointrial", driver="ESRI Shapefile")

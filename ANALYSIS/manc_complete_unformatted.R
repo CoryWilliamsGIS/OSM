@@ -12,6 +12,7 @@ library(corrplot)
 library("readxl")
 
 
+
 #Nairobi <- read_excel("Case_study_common_data.xlsx", sheet = "Nairobi")
 GM_PCA <-
   read_excel("Case_study_common_data.xlsx", sheet = "GM_PCA")
@@ -105,7 +106,7 @@ m_tag_drinking_water[is.na(m_tag_drinking_water)] <- 0
 #join back together,
 
 #first column - al wards
-m_const_tag1 <- m_tag_begin
+m_tag1 <- m_tag_begin
 
 #join each tag
 m_tag1 <- left_join(m_tag1, m_tag_unique_users, by = c("ward" = "WARD"))
@@ -152,6 +153,7 @@ m_tag2[is.na(m_tag2)] <- 0
 depdf <- m_tag2
 indepdf <- GM_PCA
 
+join <- left_join(indepdf, depdf, by = c("Ward name" = "ward"))
 #depdf <- names(depdf)[1] <- "ward"
 #indepdf <- names(indepdf)[2] <- "ward"
 #depdf <- as.numeric(depdf)
@@ -176,7 +178,11 @@ indepdf <- GM_PCA
 #wardlist2 <- gsub("\\s*\\w*$", "", indepdf$`Ward code`)
 #indepdf$ `Ward code`<- wardlist2
 
-join <- left_join(indepdf, depdf, by = c("Ward name" = "ward"))
+
+#join <- join[-51:-78]
+
+colnames(join)
+names(join) <- gsub(".x", "", names(join), fixed = TRUE)
 
 #write.csv(join, file = "Manchester_wards_join.csv")
 
@@ -233,48 +239,48 @@ round(res, 3)
 
 library("corrplot")
 
-
-
-#symnum(res, abbr.colnames = FALSE)
-
-corrplot(
-  res,
-  type = "upper",
-  order = "hclust",
-  tl.col = "black",
-  tl.srt = 45
-)
-
-#this produces a nice plot
-#can be used to explain why certain things removed
-#not sure what the signif level doe stho
-#correlation matrix between independent values
-corrplot(
-  indepcor2$r,
-  type = "upper",
-  order = "hclust",
-  p.mat = indepcor2$P,
-  sig.level = 0.1,
-  insig = "blank"
-)
-
-#same for dependent values (could be amazing diss did this - check?)
-#View(depcor)
-depcor <- depcor[, -1]
-res2 <- cor(depcor)
-depcor2 <- rcorr(as.matrix(depcor))
-round(res2, 3)
-symnum(res2, abbr.colnames = FALSE)
-
-#best one yet - just edit names to make them shorter!!!!
-corrplot(
-  depcor2$r ,
-  type = "upper",
-  order = "hclust",
-  p.mat = depcor2$P,
-  sig.level = 0.1,
-  insig = "blank"
-)
+# 
+# 
+# #symnum(res, abbr.colnames = FALSE)
+# 
+# corrplot(
+#   res,
+#   type = "upper",
+#   order = "hclust",
+#   tl.col = "black",
+#   tl.srt = 45
+# )
+# 
+# #this produces a nice plot
+# #can be used to explain why certain things removed
+# #not sure what the signif level doe stho
+# #correlation matrix between independent values
+# corrplot(
+#   indepcor2$r,
+#   type = "upper",
+#   order = "hclust",
+#   p.mat = indepcor2$P,
+#   sig.level = 0.1,
+#   insig = "blank"
+# )
+# 
+# #same for dependent values (could be amazing diss did this - check?)
+# #View(depcor)
+# depcor <- depcor[, -1]
+# res2 <- cor(depcor)
+# depcor2 <- rcorr(as.matrix(depcor))
+# round(res2, 3)
+# symnum(res2, abbr.colnames = FALSE)
+# 
+# #best one yet - just edit names to make them shorter!!!!
+# corrplot(
+#   depcor2$r ,
+#   type = "upper",
+#   order = "hclust",
+#   p.mat = depcor2$P,
+#   sig.level = 0.1,
+#   insig = "blank"
+# )
 
 
 
@@ -307,7 +313,42 @@ corrplot(
 
 names(join)[4] <- "pp_hh"
 names(join)[5] <- "total_hh"
+names(join)[23] <- "users"
 
+
+lm_osmuid <-
+  lm(
+    join$users ~ join$population +
+      join$pp_hh +
+      join$`general sex ratio (females to males)` +
+      join$`% of households owning house they live in` +
+      join$total_hh + join$`% population U18` 
+    + join$`% pop 18-64` +
+      join$`% pop over 64` +
+      join$`% households with 1-3 people` +
+      join$`% households with 4-6 people` +
+      join$`% households with 7+ people`
+  )
+
+lm_totaledits <-
+  lm(
+    join$`total edits` ~ join$population + join$pp_hh + join$`general sex ratio (females to males)` + join$`% of households owning house they live in` + join$total_hh + join$`% population U18` + join$`% pop 18-64` + join$`% pop over 64` + join$`% households with 1-3 people` + join$`% households with 4-6 people` + join$`% households with 7+ people`
+  )
+
+lm_point <-
+  lm(
+    join$Point_Count ~ join$population + join$pp_hh + join$`general sex ratio (females to males)` + join$`% of households owning house they live in` + join$total_hh + join$`% population U18` + join$`% pop 18-64` + join$`% pop over 64` + join$`% households with 1-3 people` + join$`% households with 4-6 people` + join$`% households with 7+ people`
+  )
+
+lm_line <-
+  lm(
+    join$School ~ join$Line_Count + join$pp_hh + join$`general sex ratio (females to males)` + join$`% of households owning house they live in` + join$total_hh + join$`% population U18` + join$`% pop 18-64` + join$`% pop over 64` + join$`% households with 1-3 people` + join$`% households with 4-6 people` + join$`% households with 7+ people`
+  )
+
+lm_polygon <-
+  lm(
+    join$Polygon_Count ~ join$population + join$pp_hh + join$`general sex ratio (females to males)` + join$`% of households owning house they live in` + join$total_hh + join$`% population U18` + join$`% pop 18-64` + join$`% pop over 64` + join$`% households with 1-3 people` + join$`% households with 4-6 people` + join$`% households with 7+ people`
+  )
 #basic regression - re run for each osm statistic... use summary() to get the summary
 lm_school <-
   lm(
@@ -500,47 +541,47 @@ rm(
 #now you have to add the case study specific variables.... including lots for manchester to highlight specific variables
 #need to attempt it at constituency level
 #need to do spatial autocorrelation
-#
-
-
-
-pairs.panels(
-  indepcor,
-  cor = TRUE,
-  lm = TRUE,
-  hist.col = "cyan",
-  method = "pearson",
-  scale = FALSE,
-  pch = 20,
-  cex = 1
-)
-cor.plot(indepcor, colors = TRUE, main = "Correlation plot (matrix)")
-
-#look into what this step function does...something to do with variable choice?
-stepmodel1 <- step(lm_restaurant)
-summary(stepmodel1)
-
-plot(stepmodel1, scale = "adjr2", main = "y = sovi")
-
-varimp(stepmodel1, scale = FALSE)
-
-###malawi
-install.packages("rmarkdown")
-install.packages("partykit")
-install.packages("C50")
-install.packages("leaps")
-install.packages("psych")
-
-library(rmarkdown)
-library(partykit)
-library(C50)
-library(leaps)
-library(psych)
-
-#cite malawai
-rescale <- function(x)
-  (x - min(x)) / (max(x) - min(x)) * 100
-
+# #
+# 
+# 
+# 
+# pairs.panels(
+#   indepcor,
+#   cor = TRUE,
+#   lm = TRUE,
+#   hist.col = "cyan",
+#   method = "pearson",
+#   scale = FALSE,
+#   pch = 20,
+#   cex = 1
+# )
+# cor.plot(indepcor, colors = TRUE, main = "Correlation plot (matrix)")
+# 
+# #look into what this step function does...something to do with variable choice?
+# stepmodel1 <- step(lm_restaurant)
+# summary(stepmodel1)
+# 
+# plot(stepmodel1, scale = "adjr2", main = "y = sovi")
+# 
+# varimp(stepmodel1, scale = FALSE)
+# 
+# ###malawi
+# install.packages("rmarkdown")
+# install.packages("partykit")
+# install.packages("C50")
+# # install.packages("leaps")
+# # install.packages("psych")
+# # 
+# # library(rmarkdown)
+# library(partykit)
+# library(C50)
+# library(leaps)
+# library(psych)
+# 
+# #cite malawai
+# rescale <- function(x)
+#   (x - min(x)) / (max(x) - min(x)) * 100
+# 
 
 
 
@@ -561,16 +602,20 @@ library(dplyr)
 
 GM_wardshp1 <- readOGR(dsn = ".", layer = "gm_wardsshp1")
 plot(GM_wardshp1)
+GM_wardshp1 <- GM_wardshp1[-3]
+plot(GM_wardshp1, col="blue")
+#join <- join[, -17:-18]
+GM_wardshp1$name
 
-
-join <- join[, -17:-18]
+join$name
 
 colnames(join)[2] <- "name"
+
 #GM
 #n_occur <- data.frame(table(GM_PCA$`Ward name`))
 #n_occur[n_occur$Freq > 1, ]
 
-
+jointrial$`Distinct osm_users`
 
 jointrial <- merge(GM_wardshp1, join)
 
@@ -693,6 +738,52 @@ tm_shape(local_moran_map) + tm_fill(col = "Ii", style = "quantile", title = "Loc
     legend.text.size = 1,
     legend.position = c("left", "bottom")
   )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

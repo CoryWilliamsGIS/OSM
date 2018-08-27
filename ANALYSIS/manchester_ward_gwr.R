@@ -46,7 +46,7 @@ Manchester_ward_tags1[35, 2] <-  "Brooklands Trafford"
 Manchester_ward_tags1[179, 2] <-  "St Mary's Bury"
 Manchester_ward_tags1[180, 2] <-  "St Mary's Oldham"
 Manchester_ward_tags1[181, 2] <-  "St Mary's Trafford"
-Manchester_ward_tags1 <- Manchester_ward_tags1[, c(1:50, 1)]
+Manchester_ward_tags1 <- Manchester_ward_tags1[, c(1:49, 1)]
 Manchester_ward_tags <- Manchester_ward_tags1
 Manchester_ward_tags <- Manchester_ward_tags[, -1]
 
@@ -90,9 +90,12 @@ m_tag_church <- Manchester_ward_tags1[, 46:47]
 m_tag_mosque <- Manchester_ward_tags1[, 48:49]
 m_tag_drinking_water[is.na(m_tag_drinking_water)] <- 0
 
-m_tag1 <- m_tag_begin
+#m_tag1 <- m_tag_begin
+m_tag1 <- m_tag_unique_users
+names(m_tag1)[1] <- "ward"
+
 #join each tag
-m_tag1 <- left_join(m_tag1, m_tag_unique_users, by = c("ward" = "WARD"))
+#m_tag1 <- left_join(m_tag1, m_tag_unique_users, by = c("ward" = "WARD"))
 m_tag1 <- left_join(m_tag1, m_tag_school, by = c("ward" = "ward1"))
 m_tag1 <- left_join(m_tag1, m_tag_college, by = c("ward" = "ward2"))
 m_tag1 <- left_join(m_tag1, m_tag_pub, by = c("ward" = "ward3"))
@@ -113,7 +116,7 @@ m_tag1 <- left_join(m_tag1, m_tag_bus_stop, by = c("ward" = "ward17"))
 m_tag1 <-left_join(m_tag1, m_tag_street_lamp, by = c("ward" = "ward18"))
 m_tag1 <- left_join(m_tag1, m_tag_hotel, by = c("ward" = "ward19"))
 m_tag1 <-left_join(m_tag1, m_tag_industrial, by = c("ward" = "ward20"))
-m_tagtag1 <-left_join(m_tag1, m_tag_apartment, by = c("ward" = "ward21"))
+m_tag1 <-left_join(m_tag1, m_tag_apartment, by = c("ward" = "ward21"))
 m_tag1 <- left_join(m_tag1, m_tag_house, by = c("ward" = "ward22"))
 m_tag1 <- left_join(m_tag1, m_tag_church, by = c("ward" = "ward23"))
 m_tag1 <- left_join(m_tag1, m_tag_mosque, by = c("ward" = "ward24"))
@@ -130,11 +133,11 @@ m_indepdf <- GM_PCA
 
 manchester_join <- left_join(m_indepdf, m_depdf, by = c("Ward name" = "ward"))
 names(manchester_join)[5] <- "total_hh"
-View(manchester_join)
+#View(manchester_join)
 
 #create the pp_hh variable
 manchester_join$pp_hh <- as.numeric(manchester_join$population)/as.numeric(manchester_join$total_hh)
-manchester_join$pop_density <- manchester_join$population / manchester_join$`Area (km2)`
+#manchester_join$pop_density <- manchester_join$population / manchester_join$`Area (km2)`
 #write.csv(manchester_join, file = "manchester_join.csv")
 
 manchester_join3 <- manchester_join
@@ -152,7 +155,7 @@ mancr <- m_indepcor2$r
 #View (mancr)
 
 m_indepcor3 <- mancr[c(-2,-3,-5,-5,-12,-13), c(-2,-3,-5,-5,-12,-13)]
-View(m_indepcor3)
+#View(m_indepcor3)
 colnames(m_indepcor3)
 
 manchester_join2 <- manchester_join3
@@ -161,7 +164,10 @@ manc_names <- colnames(manchester_join2)
 manchester_join3 <- data.frame(sapply(manchester_join3, function(x) as.numeric(as.character(x))))
 colnames(manchester_join3) <- manc_names
 manchester_join3[,1:2] <- manchester_join2[,1:2]
+#names(manchester_join3) <- gsub(".x", "", names(join), fixed = TRUE)
 
+#length(manchester_join3)
+#length(manc_names)
 names(manchester_join3)[23] <- "users"
 names(manchester_join3)[29] <- "ft_density"
 
@@ -589,9 +595,7 @@ lm_apartments <- lm(
 lm_house <- lm(
   manchester_join3$House ~ manchester_join3$population +
     manchester_join3$`general sex ratio (females to males)` +
-    
     manchester_join3$`% pop 18-64` +
-    
     manchester_join3$`% households with 1-3 people` +
     manchester_join3$`% Employment Rate` +
     manchester_join3$`% of households owning house they live in` +
@@ -1837,3 +1841,10 @@ qtm(gwr.map.lmapartments, fill = "localR2")
 qtm(gwr.map.lmhouse, fill = "localR2") 
 qtm(gwr.map.lmchurch, fill = "localR2") 
 qtm(gwr.map.lmmosque, fill = "localR2") #big deviation
+
+
+
+writeOGR(m_jointrial, ".", "m_jointrial", driver="ESRI Shapefile")
+
+
+

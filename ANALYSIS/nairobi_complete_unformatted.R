@@ -448,12 +448,17 @@ n_lm_church <- lm(nairobi_join3$Church ~nairobi_join3$`total population`+
 n_lm_mosque <- lm(nairobi_join3$Mosque ~nairobi_join3$`total population`+  
                     nairobi_join3$`general sex ratio (females to males)`+ 
                     nairobi_join3$`% of primary school attendance (6-13)`+ 
-                    nairobi_join3$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join3$`education level index`+ 
-                    nairobi_join3$`% households owning own livestock`+ nairobi_join3$`% pop 18-64`+ 
+                    nairobi_join3$`Secondary School Attendance of 14- to 17-Year-Olds`+ 
+                    nairobi_join3$`education level index`+ 
+                    nairobi_join3$`% households owning own livestock`+ 
+                    nairobi_join3$`% pop 18-64`+ 
                     nairobi_join3$`% households with 1-3 people`+
                     nairobi_join3$`% of female headed households`+ 
-                    nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
-                    nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density)
+                    nairobi_join3$`% of households owning house they live in`+ 
+                    nairobi_join3$`% Employment Rate`+ 
+                    nairobi_join3$`% access to safe water source`+ 
+                    nairobi_join3$`% access to improved sanitation`+ 
+                    nairobi_join3$pop_density)
 
 summary(n_lm_osmuid) 
 summary(n_lm_totaledits)
@@ -485,34 +490,9 @@ summary(n_lm_apartments)
 summary(n_lm_house)
 summary(n_lm_church)
 summary(n_lm_mosque) 
-summary(n_lm_totaledits)
-summary(n_lm_point)
-summary(n_lm_line)
-summary(n_lm_polygon)
-summary(n_lm_school)
-summary(n_lm_college)
-summary(n_lm_pub)
-summary(n_lm_bar)
-summary(n_lm_pharmacy)
-summary(n_lm_hospital)
-summary(n_lm_dentist)
-summary(n_lm_clinic)
-summary(n_lm_police)
-summary(n_lm_bank)
-summary(n_lm_atm)
-summary(n_lm_restaurant)
-summary(n_lm_fastfood)
-summary(n_lm_toilets)
-summary(n_lm_drinkingwater)
-summary(n_lm_placeofworship)
-summary(n_lm_busstop)
-summary(n_lm_streetlamp)
-summary(n_lm_hotel)
-summary(n_lm_industrial)
-summary(n_lm_apartments)
-summary(n_lm_house)
-summary(n_lm_church)
-summary(n_lm_mosque)
+
+##4 line ones!!!!
+
 
 
 #clean up
@@ -649,6 +629,74 @@ moran.test(n_jointrial$pop_density ,n_listw)#moran I statistic --> 0.22
 
 
 
+
+
+gwrbandwidth.n_lm_totaledis <-
+  gwr.sel(nairobi_join3$`total edits` ~nairobi_join3$`total population`+  
+             nairobi_join3$`general sex ratio (females to males)`+ 
+             nairobi_join3$`% of primary school attendance (6-13)`+ 
+             nairobi_join3$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join3$`education level index`+ 
+             nairobi_join3$`% households owning own livestock`+ nairobi_join3$`% pop 18-64`+ 
+             nairobi_join3$`% households with 1-3 people`+
+             nairobi_join3$`% of female headed households`+ 
+             nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
+             nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density,
+           data =n_jointrial,
+           adapt = T)
+
+gwrmodel.n_lm_totaledis <-
+  gwr(nairobi_join3$`total edits` ~nairobi_join3$`total population`+  
+            nairobi_join3$`general sex ratio (females to males)`+ 
+            nairobi_join3$`% of primary school attendance (6-13)`+ 
+            nairobi_join3$`Secondary School Attendance of 14- to 17-Year-Olds`+ nairobi_join3$`education level index`+ 
+            nairobi_join3$`% households owning own livestock`+ nairobi_join3$`% pop 18-64`+ 
+            nairobi_join3$`% households with 1-3 people`+
+            nairobi_join3$`% of female headed households`+ 
+            nairobi_join3$`% of households owning house they live in`+ nairobi_join3$`% Employment Rate`+ 
+            nairobi_join3$`% access to safe water source`+ nairobi_join3$`% access to improved sanitation`+nairobi_join3$pop_density,
+          data =n_jointrial, adapt = gwrbandwidth.n_lm_point, hatmatrix=TRUE, se.fit=TRUE)
+
+gwrmodel.n_lm_totaledis
+
+
+results.gwrmodel.n_lm_totaledits <- as.data.frame(gwrmodel.n_lm_totaledis$SDF)
+
+gwr.map.n_lm_totaledits <-
+  cbind(n_jointrial,
+        as.matrix(results.gwrmodel.n_lm_totaledits))
+
+qtm(gwr.map.n_lm_totaledits, fill = "localR2")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#warnings()
 #============================================================================================================================
 #Nairobi consituency
 #============================================================================================================================
@@ -2853,7 +2901,7 @@ gwrbandwidth.n_lm_mosque <-
 
 
 
-
+##############
 
 gwrmodel.n_lm_osmuid <-
   gwr(
@@ -3406,11 +3454,31 @@ gwrmodel.n_lm_mosque <-
 
 
 
+gwrmodel.n_lm_totaledis
+gwrmodel.n_lm_point
+gwrmodel.n_lm_line
+gwrmodel.n_lm_polygon
+gwrmodel.n_lm_ft_density
+gwrmodel.n_lm_school
+gwrmodel.n_lm_college
+gwrmodel.n_lm_pub
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 results.gwrmodel.n_lm_osmuid <-
   as.data.frame(gwrmodel.n_lm_osmuid$SDF)
-
+  
 results.gwrmodel.n_lm_totaledits <-
   as.data.frame(gwrmodel.n_lm_totaledis$SDF)
 
@@ -3487,6 +3555,7 @@ results.gwrmodel.n_lm_mosque <-
   as.data.frame(gwrmodel.n_lm_mosque$SDF)
 
 
+gde_15 <- 
 
 
 
@@ -3602,14 +3671,40 @@ BFC02.gwr.test(gwr.model)
 
 
 
+qtm(gwr.map.n_lm_osmuid, fill = "localR2")######
+qtm(gwr.map.n_lm_totaledits, fill = "localR2")
+qtm(gwr.map.n_lm_point, fill = "localR2") #.995-1
+qtm(gwr.map.n_lm_line, fill = "localR2")
+qtm(gwr.map.n_lm_polygon, fill = "localR2")
+qtm(gwr.map.n_lm_ftdensity, fill = "localR2")
+qtm(gwr.map.n_lm_school, fill = "localR2")
+qtm(gwr.map.n_lm_college, fill = "localR2")
+qtm(gwr.map.n_lm_pub, fill = "localR2")
+qtm(gwr.map.n_lm_bar, fill = "localR2")
+qtm(gwr.map.n_lm_pharmacy, fill = "localR2")
+qtm(gwr.map.n_lm_hospital, fill = "localR2")
+qtm(gwr.map.n_lm_dentist, fill = "localR2")
+qtm(gwr.map.n_lm_clinic, fill = "localR2")
+qtm(gwr.map.n_lm_police, fill = "localR2")
+qtm(gwr.map.n_lm_bank, fill = "localR2")
+qtm(gwr.map.n_lm_atm, fill = "localR2")
+qtm(gwr.map.n_lm_restaurant, fill = "localR2")
+qtm(gwr.map.n_lm_fastfood, fill = "localR2")
+qtm(gwr.map.n_lm_placeofworship, fill = "localR2")
+qtm(gwr.map.n_lm_busstop, fill = "localR2")
+qtm(gwr.map.n_lm_streetlmap, fill = "localR2")
+qtm(gwr.map.n_lm_hotel, fill = "localR2")
+qtm(gwr.map.n_lm_apartments, fill = "localR2")
+qtm(gwr.map.n_lm_house, fill = "localR2")
+qtm(gwr.map.n_lm_church, fill = "localR2")
+qtm(gwr.map.n_lm_mosque, fill = "localR2")
 
 
+library(tmap)
 
+gwr.map.n_lm_pub$localR2
 
-
-
-
-
+ggplot(gwr.map.n_lm_apartments, fill = "localR2")
 
 
 
@@ -3694,4 +3789,290 @@ map
 
 
 
-install.packages("tidyverse")
+
+library(tidyverse)
+library(magrittr)
+library(ggplot2)
+library(rgeos)
+library(rgdal)
+library(viridis)
+library(dplyr)
+library(tidyr)
+
+library
+gde_15 <- nairobi_constshp2
+data <- nairobi_const_join3
+
+map_data_fortified <- fortify(gde_15, CONSTITUEN = "BFS_ID") %>% 
+  mutate(id = as.numeric(id))
+
+map_data_political <- map_data_fortified %>% left_join(data, by = c("bfs_id" = "id"))
+map_data_political <- map_data_political[complete.cases(map_data_political),]
+
+
+df.new <- mutate (nairobi_const_join3, variable = rownames(nairobi_const_join3)) %>%
+  gather(colnames(nairobi_const_join3, -variable))
+
+
+View(df.new)
+
+
+lnd <- nairobi_const_join3
+
+
+lnd_f <- fortify(nairobi_const_join3)
+head(lnd_f, n = 2) # peak at the fortified data
+lnd$id <- row.names(lnd) # allocate an id variable to the sp data
+head(lnd@data, n = 2) # final check before join (requires shared variable name)
+lnd_f <- left_join(lnd_f, lnd@data) # join the data
+
+#basic map
+m_cont <- tm_shape +
+  tm_polygons("Point_Count")+
+  tm_credits(paste0("Data @ Unites States Department of Agriculture\n",
+                    "Shape @ Unites States Census Bureau"),
+             position = c("right", "bottom")) +
+  tm_layout(title = "ok",
+            title.position = c("centre",  "top"),
+            legend.position = c("right", "bottom"), frame = FALSE,
+            inner.margins = c(0.1, 0.1, 0.05, 0.05))
+  
+
+m_cont
+
+
+
+
+m_cont <- tm_shape(n_jointrial2) +
+  tm_polygons("Point_Count", border.col = "black", alpha = 1) +
+  tm_credits("(c) Statistics Netherlands (CBS) and\nKadaster Nederland",
+             position = c("0.3", "0.05")) +
+  tm_layout(
+    title = "ok  yewhdsbce hebfehe ",
+    title.position = c("0.3",  "0.98"),
+    legend.position = c("0.85", "0.1"),
+    frame = FALSE,
+    inner.margins = c(0.1, 0.1, 0.05, 0.05)
+  ) +
+  tm_scale_bar(
+    breaks = NULL,
+    width = NA,
+    size = 0.5,
+    text.color = NA,
+    color.dark = "black",
+    color.light = "white",
+    lwd = 1,
+    position = c("0.05", "0.05"),
+    just = NA
+  ) +
+  tm_compass(
+    north = 0,
+    type = NA,
+    fontsize = 0.8,
+    size = 3,
+    show.labels = 1,
+    cardinal.directions = c("N", "E", "S", "W"),
+    text.color = NA,
+    color.dark = NA,
+    color.light = NA,
+    lwd = 1,
+    position = c("0.05", "0.13"),
+    just = NA
+  )
+
+m_cont
+###
+
+#https://geocompr.robinlovelace.net/adv-map.html
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+gwr.map.n_lm_point$
+
+tm_shape(boroughs) + tm_borders(alpha = .5) +
+  tm_shape(house.pts) + tm_dots(
+    col = "Price",
+    breaks = breaks$brks,
+    palette = "Reds",
+    title = "Price Paid (£)"
+  ) +
+  tm_compass() +
+  tm_scale_bar(width = 0.15) +
+  tm_layout(
+    "Spatial Distribution
+    of Price Paid Data
+    2016",
+    title.size = 1.2,
+    legend.position = c("left", "bottom"),
+    legend.text.size = 0.8,
+    legend.title.size = 01.2,
+    frame = FALSE
+  )
+
+
+
+
+#map examples
+
+#decent
+m_cont <- tm_shape(n_jointrial2) +
+  tm_polygons("Point_Count", border.col = "black", alpha = 1) +
+  tm_credits("(c) Statistics Netherlands (CBS) and\nKadaster Nederland",
+             position = c("0.3", "0.05")) +
+  tm_layout(
+    title = "ok  yewhdsbce hebfehe ",
+    title.position = c("0.3",  "0.98"),
+    legend.position = c("0.85", "0.1"),
+    frame = FALSE,
+    inner.margins = c(0.1, 0.1, 0.05, 0.05)
+  ) +
+  tm_scale_bar(
+    breaks = NULL,
+    width = NA,
+    size = 0.5,
+    text.color = NA,
+    color.dark = "black",
+    color.light = "white",
+    lwd = 1,
+    position = c("0.05", "0.05"),
+    just = NA
+  ) +
+  tm_compass(
+    north = 0,
+    type = NA,
+    fontsize = 0.8,
+    size = 3,
+    show.labels = 1,
+    cardinal.directions = c("N", "E", "S", "W"),
+    text.color = NA,
+    color.dark = NA,
+    color.light = NA,
+    lwd = 1,
+    position = c("0.05", "0.13"),
+    just = NA
+  )
+
+m_cont
+
+
+
+
+#work in progress
+m_cont <- tm_shape(n_const_jointrial2) +
+  tm_polygons(col = "Point_Count", n = 5, palette= "RdBu", style="pretty", border.col ="black", alpha = 1) +
+  
+  #tm_shape(n_const_jointrial2) +
+ # tm_fill("Point_Count")+
+ # tm_shape(nairobi_wardshp2) +
+  
+  #tm_borders(lwd=1.9, lty=1, col="black", alpha =1)+
+  
+  tm_credits("(c) Statistics Netherlands (CBS) and\nKadaster Nederland",
+             position = c("0.3", "0.05")) +
+  tm_layout(
+    title = "ok  yewhdsbce hebfehe ",
+    title.position = c("0.3",  "0.98"),
+    legend.position = c("0.85", "0.1"),
+    legend.width = 9,
+    legend.height = 9,
+    legend.text.size = 0.8,
+    frame = FALSE,
+    inner.margins = c(0.1, 0.1, 0.05, 0.05)
+  ) +
+  tm_scale_bar(
+    breaks = NULL,
+    width = NA,
+    size = 0.5,
+    text.color = NA,
+    color.dark = "black",
+    color.light = "white",
+    lwd = 1,
+    position = c("0.05", "0.05"),
+    just = NA
+  ) +
+  tm_compass(
+    north = 0,
+    type = NA,
+    fontsize = 0.8,
+    size = 3,
+    show.labels = 1,
+    cardinal.directions = c("N", "E", "S", "W"),
+    text.color = NA,
+    color.dark = NA,
+    color.light = NA,
+    lwd = 1,
+    position = c("0.05", "0.13"),
+    just = NA
+  )
+
+m_cont
+
+
+
+
+###
+
+#https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/colorPaletteCheatsheet.pdf pallete options
+  m_cont <- tm_shape(n_const_jointrial2) +
+  tm_polygons(col = "Point_Count", n = 5, palette= "YI0rRd", style="pretty", border.col ="black", alpha = 1) +
+    tm_dots(size = "Line_Count", col = "red")+
+  
+  #tm_shape(n_const_jointrial2) +
+  # tm_fill("Point_Count")+
+  # tm_shape(nairobi_wardshp2) +
+  
+  #tm_borders(lwd=1.9, lty=1, col="black", alpha =1)+
+  
+  tm_credits("(c) Statistics Netherlands (CBS) and\nKadaster Nederland",
+             position = c("0.3", "0.05")) +
+  tm_layout(
+    title = "ok  yewhdsbce hebfehe ",
+    title.position = c("0.3",  "0.98"),
+    legend.position = c("0.85", "0.1"),
+    legend.width = 9,
+    legend.height = 9,
+    legend.text.size = 0.8,
+    frame = FALSE,
+    inner.margins = c(0.1, 0.1, 0.05, 0.05)
+  ) +
+  tm_scale_bar(
+    breaks = NULL,
+    width = NA,
+    size = 0.5,
+    text.color = NA,
+    color.dark = "black",
+    color.light = "white",
+    lwd = 1,
+    position = c("0.05", "0.05"),
+    just = NA
+  ) +
+  tm_compass(
+    north = 0,
+    type = NA,
+    fontsize = 0.8,
+    size = 3,
+    show.labels = 1,
+    cardinal.directions = c("N", "E", "S", "W"),
+    text.color = NA,
+    color.dark = NA,
+    color.light = NA,
+    lwd = 1,
+    position = c("0.05", "0.13"),
+    just = NA
+  )
+
+m_cont
+
+
+display.brewer.all()

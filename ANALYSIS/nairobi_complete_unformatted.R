@@ -1,3 +1,6 @@
+#for ward non spatial mlr.... this is the most up to date file!
+
+
 #install.packages("caret")
 library(caret)
 #install.packages("pls")
@@ -84,7 +87,12 @@ n_tag_apartment <- Nairobi_ward_tags[,42:43]
 n_tag_house <- Nairobi_ward_tags[,44:45]
 n_tag_church <- Nairobi_ward_tags[,46:47]
 n_tag_mosque <- Nairobi_ward_tags[,48:49]
+n_tag_footway <- Nairobi_ward_tags[,50:51]
+n_tag_primary <- Nairobi_ward_tags[,52:53]
+n_tag_residential <- Nairobi_ward_tags[,54:55]
+n_tag_unclassified <- Nairobi_ward_tags[,56:57]
 n_tag_unique_users <- n_sum[,1:6]
+
 
 
 #join back together, 
@@ -116,6 +124,10 @@ n_tag1 <- left_join(n_tag1, n_tag_apartment, by=c("ward"="ward21"))
 n_tag1 <- left_join(n_tag1, n_tag_house, by=c("ward"="ward22"))  
 n_tag1 <- left_join(n_tag1, n_tag_church, by=c("ward"="ward23"))  
 n_tag1 <- left_join(n_tag1, n_tag_mosque, by=c("ward"="ward24"))
+n_tag1 <- left_join(n_tag1, n_tag_footway, by=c("ward"="ward25"))
+n_tag1 <- left_join(n_tag1, n_tag_primary, by=c("ward"="ward26"))
+n_tag1 <- left_join(n_tag1, n_tag_residential, by=c("ward"="ward27"))
+n_tag1 <- left_join(n_tag1, n_tag_unclassified, by=c("ward"="ward28"))
 
 #backup the original 
 n_tag2 <- n_tag1
@@ -460,6 +472,67 @@ n_lm_mosque <- lm(nairobi_join3$Mosque ~nairobi_join3$`total population`+
                     nairobi_join3$`% access to improved sanitation`+ 
                     nairobi_join3$pop_density)
 
+n_lm_footway <- lm(nairobi_join3$Footway ~nairobi_join3$`total population`+  
+                    nairobi_join3$`general sex ratio (females to males)`+ 
+                    nairobi_join3$`% of primary school attendance (6-13)`+ 
+                    nairobi_join3$`Secondary School Attendance of 14- to 17-Year-Olds`+ 
+                    nairobi_join3$`education level index`+ 
+                    nairobi_join3$`% households owning own livestock`+ 
+                    nairobi_join3$`% pop 18-64`+ 
+                    nairobi_join3$`% households with 1-3 people`+
+                    nairobi_join3$`% of female headed households`+ 
+                    nairobi_join3$`% of households owning house they live in`+ 
+                    nairobi_join3$`% Employment Rate`+ 
+                    nairobi_join3$`% access to safe water source`+ 
+                    nairobi_join3$`% access to improved sanitation`+ 
+                    nairobi_join3$pop_density)
+
+n_lm_primary <- lm(nairobi_join3$Primary ~nairobi_join3$`total population`+  
+                    nairobi_join3$`general sex ratio (females to males)`+ 
+                    nairobi_join3$`% of primary school attendance (6-13)`+ 
+                    nairobi_join3$`Secondary School Attendance of 14- to 17-Year-Olds`+ 
+                    nairobi_join3$`education level index`+ 
+                    nairobi_join3$`% households owning own livestock`+ 
+                    nairobi_join3$`% pop 18-64`+ 
+                    nairobi_join3$`% households with 1-3 people`+
+                    nairobi_join3$`% of female headed households`+ 
+                    nairobi_join3$`% of households owning house they live in`+ 
+                    nairobi_join3$`% Employment Rate`+ 
+                    nairobi_join3$`% access to safe water source`+ 
+                    nairobi_join3$`% access to improved sanitation`+ 
+                    nairobi_join3$pop_density)
+
+n_lm_residential <- lm(nairobi_join3$Residential ~nairobi_join3$`total population`+  
+                    nairobi_join3$`general sex ratio (females to males)`+ 
+                    nairobi_join3$`% of primary school attendance (6-13)`+ 
+                    nairobi_join3$`Secondary School Attendance of 14- to 17-Year-Olds`+ 
+                    nairobi_join3$`education level index`+ 
+                    nairobi_join3$`% households owning own livestock`+ 
+                    nairobi_join3$`% pop 18-64`+ 
+                    nairobi_join3$`% households with 1-3 people`+
+                    nairobi_join3$`% of female headed households`+ 
+                    nairobi_join3$`% of households owning house they live in`+ 
+                    nairobi_join3$`% Employment Rate`+ 
+                    nairobi_join3$`% access to safe water source`+ 
+                    nairobi_join3$`% access to improved sanitation`+ 
+                    nairobi_join3$pop_density)
+
+n_lm_unclassified <- lm(nairobi_join3$Unclassified ~nairobi_join3$`total population`+  
+                    nairobi_join3$`general sex ratio (females to males)`+ 
+                    nairobi_join3$`% of primary school attendance (6-13)`+ 
+                    nairobi_join3$`Secondary School Attendance of 14- to 17-Year-Olds`+ 
+                    nairobi_join3$`education level index`+ 
+                    nairobi_join3$`% households owning own livestock`+ 
+                    nairobi_join3$`% pop 18-64`+ 
+                    nairobi_join3$`% households with 1-3 people`+
+                    nairobi_join3$`% of female headed households`+ 
+                    nairobi_join3$`% of households owning house they live in`+ 
+                    nairobi_join3$`% Employment Rate`+ 
+                    nairobi_join3$`% access to safe water source`+ 
+                    nairobi_join3$`% access to improved sanitation`+ 
+                    nairobi_join3$pop_density)
+
+
 summary(n_lm_osmuid) 
 summary(n_lm_totaledits)
 summary(n_lm_point)
@@ -490,6 +563,10 @@ summary(n_lm_apartments)
 summary(n_lm_house)
 summary(n_lm_church)
 summary(n_lm_mosque) 
+summary(n_lm_footway)
+summary(n_lm_primary)
+summary(n_lm_residential)
+summary(n_lm_unclassified)
 
 ##4 line ones!!!!
 
@@ -526,7 +603,11 @@ rm(
   n_lm_school,
   n_lm_streetlamp,
   n_lm_toilets,
-  n_lm_totaledits
+  n_lm_totaledits,
+  n_lm_footway,
+  n_lm_primary,
+  n_lm_residential,
+  n_lm_unclassified
 )
 
 rm(
@@ -555,7 +636,11 @@ rm(
   n_tag_school,
   n_tag_street_lamp,
   n_tag_toilets,
-  n_tag_unique_users
+  n_tag_unique_users,
+  n_tag_footway,
+  n_tag_primary,
+  n_tag_residential,
+  n_tag_unclassified
 )
 
 

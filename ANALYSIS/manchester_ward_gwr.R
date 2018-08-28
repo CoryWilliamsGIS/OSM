@@ -807,19 +807,61 @@ listw
 #MORAN I - INDEPENDENT 
 moran.test(manchester_join3$population, listw)
 moran.test(manchester_join3$`general sex ratio (females to males)`, listw) 
-moran.test(manchester_join3$`% population U18`, listw) 
+#moran.test(manchester_join3$`% population U18`, listw) 
 moran.test(manchester_join3$`% pop 18-64`, listw) 
-moran.test(manchester_join3$`% pop over 64`, listw)
+#moran.test(manchester_join3$`% pop over 64`, listw)
 moran.test(manchester_join3$`% households with 1-3 people`, listw) 
 moran.test(manchester_join3$`% Employment Rate`, listw)
 moran.test(manchester_join3$`% of households owning house they live in`, listw) 
 moran.test(manchester_join3$car_or_van, listw) 
 moran.test(manchester_join3$highest_qual_level4_plus, listw) 
 moran.test(manchester_join3$christian_count, listw) 
+moran.test(manchester_join3$muslim_count, listw)
 moran.test(manchester_join3$muslim_count, listw) 
 moran.test(manchester_join3$female_lone_parent, listw)
 
 global_moran_map <- cbind(jointrial, local)
+
+?moran.test
+?localmoran
+
+#local moran - LISA
+moran.plot(manchester_join3$population, listw = nb2listw(neighbours, style = "W"))
+
+lc.population <- localmoran(x = manchester_join3$population, listw = nb2listw(neighbours, style = "W"))
+lc.population.map <- cbind(m_jointrial, lc.population)
+
+lc.population.map$Z.Ii
+tm_shape(lc.population.map) + tm_fill(col = "Ii", style = "quantile", title = "local moran stat")
+
+
+
+quadrant <- vector(mode="numeric", length=nrow(lc.population))
+
+m.pop <- manchester_join3$population - mean(manchester_join3$population)
+
+m.lc.pop <- lc.population[,1] - mean(lc.population[,1])
+
+signif <- 0.05
+
+# builds a data quadrant
+quadrant[m.pop >0 & m.lc.pop>0] <- 4  
+quadrant[m.pop <0 & m.lc.pop<0] <- 1      
+quadrant[m.pop <0 & m.lc.pop>0] <- 2
+quadrant[m.pop >0 & m.lc.pop<0] <- 3
+quadrant[lc.population[,5]>signif] <- 0   
+
+
+brks <- c(0,1,2,3,4)
+
+colors <- c("white","blue",rgb(0,0,1,alpha=0.4),rgb(1,0,0,alpha=0.4),"red")
+
+plot(m_jointrial, border="lightgray", col=colors[findInterval(quadrant, brks, all.inside=FALSE)])
+box()
+legend("bottomleft",legend=c("insignificant","low-low","low-high","high-low","high-high"),
+       fill=colors,bty="n")
+
+
 
 #MORAN I - DEPENDENT
 
@@ -2050,7 +2092,18 @@ qtm(gwr.map.lmresidential, fill = "localR2")
 qtm(gwr.map.lmunclassified, fill = "localR2") #decent
 
 
-writeOGR(m_jointrial, ".", "m_jointrial", driver="ESRI Shapefile")
+writeOGR(m_jointrial, ".", "m_jointrial3", driver="ESRI Shapefile")
 
 
+freq <- read_excel("ward_amenity_frequency.xlsx", sheet = "manc")
+#View(manchester_join3)
 
+freqjoin <- left_join(manchester_join3, freq, by = c("name" = "name"))
+View(freqjoin)
+freqjoin[is.na(freqjoin)] <- 0
+
+
+m_jointrial4 <- merge(GM_wardshp1, freqjoin)
+writeOGR(m_jointrial4, ".", "m_jointrial4", driver="ESRI Shapefile")
+
+write.csv(manchester_join3, file = "Manc_Dep_Appendix.csv")

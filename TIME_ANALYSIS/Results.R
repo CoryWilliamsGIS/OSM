@@ -65,7 +65,8 @@ p2
 #OVERALL FEATURE PLOTS
 
 #Save the export with the legend hidden 
-d2 <- plot_ly(ndep, y = ~ndep$Footway, x = ~ndep$year, name = 'Footway',type='scatter', mode='lines+markers') %>%    
+#First 
+n.overall <- plot_ly(ndep, y = ~ndep$Footway, x = ~ndep$year, name = 'Footway',type='scatter', mode='lines+markers') %>%    
   add_trace(y = ~ndep$Primary , name = 'Primary', color = I('thistle1'),type='scatter', mode='lines+markers') %>%  
   add_trace(y = ~ndep$Residential , name = 'Residential', color = I('chocolate'), type='scatter', mode='lines+markers') %>%  
   add_trace(y = ~ndep$Unclassified , name = 'Unclassified',color = I('navy'), type='scatter', mode='lines+markers')%>%
@@ -86,11 +87,11 @@ d2 <- plot_ly(ndep, y = ~ndep$Footway, x = ~ndep$year, name = 'Footway',type='sc
          legend = list(orientation='h', x=-0, y=-0.15))
 
 
-d2
-hide_legend(d2)
+n.overall
+hide_legend(n.overall)
 
 #Save the export with the legend hidden
-d3 <- plot_ly(ndep, y = ~ndep$College, x = ~ndep$year, name = 'College', type='scatter', mode='lines+markers') %>%
+n.overall2 <- plot_ly(ndep, y = ~ndep$College, x = ~ndep$year, name = 'College', type='scatter', mode='lines+markers') %>%
     add_trace(y = ~ndep$Pub, name = 'Pub', color = I('red'),type='scatter', mode='lines+markers') %>%
     add_trace(y = ~ndep$Bar, name = 'Bar', color = I('light green'),type='scatter', mode='lines+markers') %>%
     add_trace(y = ~ndep$Dentist , name = 'Dentist',color = I('purple'), type='scatter', mode='lines+markers') %>%
@@ -106,8 +107,8 @@ d3 <- plot_ly(ndep, y = ~ndep$College, x = ~ndep$year, name = 'College', type='s
         # xaxis = list(title = "Years"),
          yaxis = list(title ="Number of Feature"),
          legend = list(orientation='h', x=-0, y=-0.4))
-d3
-hide_legend(d3)
+n.overall.2
+hide_legend(n.overall2)
 
 #Create a subplot just to crop the formatted legend from 
 d <- subplot(d2, d3, nrows = 2, shareX = TRUE)
@@ -129,8 +130,8 @@ library(plotly)
 
 #read in data
 x = c("2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018")
-y1 = c(1.034948815,	5.411645383,	1.704175103,	12.36054748,	45.75901771,	50.79226937, 55.34129345,	48.97920524,	74.64407764,	80.31607763,	103.8581869)
-y2 = c(1.615049625,	2.647453998,	4.628547983,	8.04717953,	8.355361018,	0,	11.96835267,	15.65567731,	17.65684937,	19.8078436,	0)
+y1 = c(1,	3,	1,	4,	16,	17,	19,	17,	28,	30,	36)
+y2 = c(2.330721003,	5.073667712,	8.799373041,	17.02115987,	17.67241379,	0,	26.64733542,	34.38166144,	38.81974922,	42.14106583,	0)
 data <- data.frame(x, y1, y2)
 
 
@@ -152,39 +153,60 @@ p
 
 colors()
 
-#trial with outlines
-p <- plot_ly(data, x = ~x, y = ~y1, type = 'bar', name = 'Nairobi', marker = list(color = 'darkorange', line = list(color = 'darkorange1', width = 1.5))) %>%
+#=================================================================================
+#PLOTS FOR REPORT
+
+#HISTOGRAM - FEATURE DENSITYm
+#REMEMBER TO EXPORT - GREATER MANCHESTER DATA MISSING FOR 2018 AND 2013
+time.ftdensity <- plot_ly(data, x = ~x, y = ~y1, type = 'bar', name = 'Nairobi', marker = list(color = 'darkorange', line = list(color = 'darkorange1', width = 1.5))) %>%
 #  add_trace(y = ~y2, type = 'bar', name = 'Greater Manchester',  marker = list(color = 'dodgerblue')) %>%
   add_trace(y = ~y2, name = 'Greater Manchester', marker = list(color = 'dodgerblue', line = list(color = 'darkblue', width = 1.5))) %>%
   layout(title = "OpenStreetMap Feature Density 2008-2018",
          xaxis = list(title = "Years", tickangle = -45),
-         yaxis = list(title = "Feature Density (km2)", range = c(0,105)),
+         yaxis = list(title = "Feature Density (km2)", range = c(0,55)),
          margin = list(b = 105),
          barmode = 'group')
 
-p
+time.ftdensity #EXPORT
 
-#original - REPEAT FOTR USERS, VERSION 1'S... AS OVERVIREW BEFORE FACET MAPS
-p <- plot_ly(data, x = ~x, y = ~y1, type = 'bar', name = 'Nairobi', marker = list(color = 'darkorange')) %>%
-     add_trace(y = ~y2, name = 'Greater Manchester', marker = list(color = 'dodgerblue')) %>%
-     layout(title = "OpenStreetMap Feature Density 2008-2018",
-       xaxis = list(title = "", tickangle = -45),
-                       yaxis = list(title = "", range = c(0,105)),
-                       margin = list(b = 105),
-                       barmode = 'group')
+#VERSION 1 EDITS HISTOGRAM
+v1.x = c("2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018")
+v1.y <- c(562,	1178,	263,	1205,	8931,	8950,	8502,	8183,	15060,	16290,	20482)
+v1.y2 <- c(2870,	4538,	6831,	13751,	13634,	0, 19774,	26268,	27490,	31387,	0) #Fill in GM 0's
+v1.data <- data.frame(v1.x, v1.y, v1.y2)
 
-#print plot
-p
+time.v1 <- plot_ly(v1.data, x = ~v1.x, y = ~v1.y, type = 'bar', name = 'Nairobi', marker = list(color = 'darkorange', line = list(color = 'darkorange1', width = 1.5))) %>%
+   # add_trace(y = ~y2, type = 'bar', name = 'Greater Manchester',  marker = list(color = 'dodgerblue')) %>%
+  add_trace(y = ~v1.y2, name = 'Greater Manchester', marker = list(color = 'dodgerblue', line = list(color = 'darkblue', width = 1.5))) %>%
+  layout(title = "OpenStreetMap Version 1 Features 2008-2018",
+         xaxis = list(title = "Years", tickangle = -45),
+         yaxis = list(title = "Number of Version 1 Features", range = c(0,36000)),
+         margin = list(b = 105),
+         barmode = 'group')
 
-
-
-
-
-
-
+time.v1 #EXPORT
 
 
+#OSM_UID HISTOGRAM
+users.x = c("2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018")
+users.y <- c(17,	46,	44,	127,	266,	336,	417,	462,	651,	775, 879)
+users.y2 <- c(17,	94,	233,	343,	364,	0,	792,	953,	1058,	1082,	0) #Fill in GM where 0
+users.data <- data.frame(users.x, users.y, users.y2)
 
+time.users <- plot_ly(users.data, x = ~users.x, y = ~users.y, type = 'bar', name = 'Nairobi', marker = list(color = 'darkorange', line = list(color = 'darkorange1', width = 1.5))) %>%
+  # add_trace(y = ~y2, type = 'bar', name = 'Greater Manchester',  marker = list(color = 'dodgerblue')) %>%
+  add_trace(y = ~users.y2, name = 'Greater Manchester', marker = list(color = 'dodgerblue', line = list(color = 'darkblue', width = 1.5))) %>%
+  layout(title = "OpenStreetMap Users 2008-2018",
+         xaxis = list(title = "Years", tickangle = -45),
+         yaxis = list(title = "Number of Users", range = c(0,1210)),
+         margin = list(b = 105),
+         barmode = 'group')
+
+time.users #EXPORT
+
+
+
+#GROUPED LINE GRAPH
 
 ngroup1 <- c(2008,	19,	13,	9,	11,	248,	0)
 ngroup2 <- c(2009,	23,	23,	11,	10,	1577,	0)
@@ -206,18 +228,18 @@ rownames(grouped) <- c("1", "2", "3",  "4", "5", "6", "7", "8", "9", "10", "11")
 
 #GROUPED LINE GRAPH - MUCH BETTER!!!
 
-d2 <- plot_ly(ndep, y = ~grouped$Recreation , x = ~grouped$Year, name = 'Recreation',type='scatter', mode='lines+markers') %>%    
+n.grouped.line <- plot_ly(ndep, y = ~grouped$Recreation , x = ~grouped$Year, name = 'Recreation',type='scatter', mode='lines+markers') %>%    
    add_trace(y = ~grouped$Public_Services , name = 'Public Services',type='scatter', mode='lines+markers') %>%  
    add_trace(y = ~grouped$Education , name = 'Education',  type='scatter', mode='lines+markers') %>%  
    add_trace(y = ~grouped$Religion, name = 'Religion', type='scatter', mode='lines+markers')%>%
    add_trace(y = ~grouped$Infrastructure , name = 'Infrastructure', type='scatter', mode='lines+markers') %>%
-   add_trace(y = ~grouped$Misc , name = 'Misc',type='scatter', mode='lines+markers') %>%
-  layout(title = "Nairobi OSM Features",
-         #   xaxis = list(title = "Years"),
+   add_trace(y = ~grouped$Misc , name = 'Property',type='scatter', mode='lines+markers') %>%
+  layout(title = "Nairobi OSM Feature Groups 2008-2018",
+            xaxis = list(title = "Years"),
          yaxis = list(title ="Number of Feature"),
          legend = list(orientation='h', x=-0, y=-0.15))
 
-d2
+n.grouped.line
 
 
 ndep1 <- read_excel("nairobi_overall.xlsx", sheet = "Sheet3")
@@ -299,3 +321,123 @@ grouped <- as.data.frame(grouped)
 #test with: 
 moran.test(manchester_join3$population, listw) #standard deviate = -1.5346
 (-0.067395723 - -0.004672897) / sqrt(0.001670636) # #-1.5346 #formuala from geoda lectures and other online resources 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+n.overall <- plot_ly(ndep, y = ~ndep$Footway, x = ~ndep$year, name = 'Footway',type='scatter', mode='lines+markers') %>%    
+
+  
+
+
+  add_trace(y = ~ndep$School, name = 'School', color = I('plum'),type='scatter', mode='lines+markers') %>%
+  
+  add_trace(y = ~ndep$Hospital , name = 'Hospital', color = I('linen'),type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$`Place of Worship` , name = 'Place of Worship', color = I('skyblue'),type='scatter', mode='lines+markers') %>%
+  layout(title = "Nairobi OSM Features",
+         #   xaxis = list(title = "Years"),
+         yaxis = list(title ="Number of Feature"),
+         legend = list(orientation='h', x=-0, y=-0.15))
+
+
+n.overall
+hide_legend(n.overall)
+
+#Save the export with the legend hidden
+n.recreation <- plot_ly(ndep, y = ~ndep$Hotel, x = ~ndep$year, name = 'College', type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Pub, name = 'Pub', color = I('red'),type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Bar, name = 'Bar', color = I('light green'),type='scatter', mode='lines+markers') %>%
+ # add_trace(y = ~ndep$Dentist , name = 'Dentist',color = I('purple'), type='scatter', mode='lines+markers') %>%
+  #add_trace(y = ~ndep$Clinic, name = 'Clinic', color = I('tan'),type='scatter', mode='lines+markers') %>%
+  #add_trace(y = ~ndep$Police , name = 'Police',color = I('magenta'),type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Bank , name = 'Bank',color = I('Orange'), type='scatter', mode='lines+markers') %>%
+ # add_trace(y = ~ndep$ATM  , name = 'ATM', color = I('Wheat'), type='scatter', mode='lines+markers') %>%
+
+  add_trace(y = ~ndep$Restaurant , name = 'Restaurant',color = I('yellow'), type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$`Fast Food` , name = 'Fast Food', color = I('black'),type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Toilets , name = 'Toilets', color = I('khaki4'),type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$`Drinking Water` , name = 'Drinking Water', color = I('brown'),type='scatter', mode='lines+markers') %>%
+  layout(title = "Nairobi OSM Features",
+          xaxis = list(title = "Years"),
+         yaxis = list(title ="Number of Feature"),
+         legend = list(orientation='h', x=-0, y=-0.4))
+n.recreation
+hide_legend(n.recreation)
+
+n.publicservices <- plot_ly(ndep, y = ~ndep$Hospital, x = ~ndep$year, name = 'College', type='scatter', mode='lines+markers') %>%
+  #add_trace(y = ~ndep$Pub, name = 'Pub', color = I('red'),type='scatter', mode='lines+markers') %>%
+  #add_trace(y = ~ndep$Bar, name = 'Bar', color = I('light green'),type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Dentist , name = 'Dentist',color = I('purple'), type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Clinic, name = 'Clinic', color = I('tan'),type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Police , name = 'Police',color = I('magenta'),type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Bank , name = 'Bank',color = I('Orange'), type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$ATM  , name = 'ATM', color = I('Wheat'), type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Pharmacy, name = 'Pharmacy', color = I('violetred'),type='scatter', mode='lines+markers') %>%
+  #add#_trace(y = ~ndep$Church , name = 'Church', type='scatter', mode='lines+markers') %>%
+  #add_#trace(y = ~ndep$Mosque , name = 'Mosque',color = I('skyblue2'), type='scatter', mode='lines+markers') %>%
+  #add_trace(y = ~ndep$Restaurant , name = 'Restaurant',color = I('yellow'), type='scatter', mode='lines+markers') %>%
+  #add_trace(y = ~ndep$`Fast Food` , name = 'Fast Food', color = I('black'),type='scatter', mode='lines+markers') %>%
+  layout(title = "Nairobi OSM Features",
+          xaxis = list(title = "Years"),
+         yaxis = list(title ="Number of Feature"),
+         legend = list(orientation='h', x=-0, y=-0.4))
+n.publicservices
+hide_legend(n.publicservices)
+
+
+n.education <- plot_ly(ndep, y = ~ndep$School, x = ~ndep$year, name = 'College', type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$College, name = 'Pub', color = I('red'),type='scatter', mode='lines+markers') %>%
+  layout(title = "Nairobi OSM Features",
+          xaxis = list(title = "Years"),
+         yaxis = list(title ="Number of Feature"),
+         legend = list(orientation='h', x=-0, y=-0.4))
+n.education
+hide_legend(n.education)
+
+n.religion <- plot_ly(ndep, y = ~ndep$`Place of Worship`, x = ~ndep$year, name = 'Place of Worship', type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Church , name = 'Church', type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Mosque , name = 'Mosque',color = I('skyblue2'), type='scatter', mode='lines+markers') %>%
+  layout(title = "Nairobi OSM Features",
+         xaxis = list(title = "Years"),
+         yaxis = list(title ="Number of Feature"),
+         legend = list(orientation='h', x=-0, y=-0.4))
+n.religion
+hide_legend(n.religion)
+
+n.infrastructure <- plot_ly(ndep, y= ~ndep$Footway, x = ~ndep$year, name = 'Footway',type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Bus_Stop , name = 'Bus Stop', color = I('gray67'),type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$`Street Lamp` , name = 'Street Lamp', color = I('forestgreen'),type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Primary , name = 'Primary', color = I('thistle1'),type='scatter', mode='lines+markers') %>%  
+  add_trace(y = ~ndep$Residential , name = 'Residential', color = I('chocolate'), type='scatter', mode='lines+markers') %>%  
+  add_trace(y = ~ndep$Unclassified , name = 'Unclassified',color = I('navy'), type='scatter', mode='lines+markers')%>%
+  layout(title = "Nairobi OSM Features",
+         xaxis = list(title = "Years"),
+         yaxis = list(title ="Number of Feature"),
+         legend = list(orientation='h', x=-0, y=-0.4))
+n.infrastructure
+#hide_legend(n.religion)
+
+n.property <- plot_ly(ndep, y= ~ndep$House , name = 'House', color = I('coral'),type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Industrial , name = 'Industrial',color = I('mediumorchid'), type='scatter', mode='lines+markers') %>%
+  add_trace(y = ~ndep$Apartments, name = 'Apartments',color = I('gold'), type='scatter', mode='lines+markers') %>%
+  layout(title = "Nairobi OSM Features",
+         xaxis = list(title = "Years"),
+         yaxis = list(title ="Number of Feature"),
+         legend = list(orientation='h', x=-0, y=-0.4))
+n.property
+
+
+#Create a subplot just to crop the formatted legend from 
+d <- subplot(n.recreation, n.publicservices, nrows = 2, shareX = TRUE)
+d 
+hide_legend(d)
